@@ -1,0 +1,14 @@
+#Ignota lo que está en temp
+data/Images
+
+src/Funciones/cosas antiguas
+src/Funciones/ProbandoCositas
+
+#algunos datos que no se ocupan
+data/DataImages/In_Streets_Coord/Detallado/ForHour_sinFDS_meanS2_r1
+
+src/Funciones/__pycache__
+
+#exceden el maximo de tamaño
+data/DataImages/DataMatrixImages.h5
+data/DataNetwork/StreetAsNode/estado_ejes_500M_10msteps.csv
