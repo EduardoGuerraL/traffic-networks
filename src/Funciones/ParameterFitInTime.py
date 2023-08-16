@@ -260,6 +260,7 @@ lista_de_datos_comp_2 = datos_comp["Closeness_streets"].tolist()
 lista_de_datos_comp = datos_comp["Betweenness_streets"].tolist()
 lista_de_datos_comp_3 = datos_comp["Degree_streets"].tolist()
 
+"""
 "ehrenfest sim"
 datos_sim = pd.read_csv("data/DataNetwork/StreetAsNode/estado_ejes_500M_10msteps.csv")
 lista_valores_ultima_columna = datos_sim[datos_sim.columns[-1]].tolist()
@@ -268,12 +269,13 @@ maximo_autos_por_calle = pd.read_csv("data/DataNetwork/StreetAsNode/N_max_autos_
 maximo_autos_por_calle = maximo_autos_por_calle[maximo_autos_por_calle.columns[-1]].tolist()
 
 fraction_taco = [i/j for i,j in zip(lista_valores_ultima_columna, maximo_autos_por_calle)]
+"""
 
 # Graficando 
 #============================
 #graficar los parametros en el tiempo.
 
-datos_computacionales = lista_de_datos_comp_3
+datos_computacionales = lista_de_datos_comp_2
 
 #almacenar los resultados
 horas = []
