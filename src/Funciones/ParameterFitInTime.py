@@ -9,6 +9,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import statistics
 import seaborn as sns
 
+from functions import obtener_nombres_con_H_M_sinFDS
 from functions import calcular_r_cuadrado
 
 
@@ -51,34 +52,6 @@ def scatter_with_linear_fit(x_values, y_values):
     #print(f'Intersección: {intercept:.4f}')
     #print(f'Error Cuadrático Medio: {mse:.4f}')
     #print(f'Desviación Estándar: {std_dev:.4f}')
-
-def obtener_nombres_con_H_M(lista_nombres,  hora_exacta=None, rango_horas=None):
-    nombres_coincidentes = []
-    patron = r"/\d{4}-\d{2}-\d{2}_\d{2}-\d{2}(?:\.png)?"
-
-    for nombre in lista_nombres:
-        match = re.search(patron, nombre)
-        if match:
-            hora_minutos_str = match.group(0).split(".")[0].split("_")[1]
-            hora = int(hora_minutos_str.split("-")[0])
-            minutos = int(hora_minutos_str.split("-")[1])
-            if hora_exacta is not None:
-                if hora == hora_exacta[0] and minutos == hora_exacta[1]:
-                    nombres_coincidentes.append(nombre)
-            elif rango_horas is not None:
-                hora_inicial = rango_horas[0]
-                hora_final = rango_horas[1]
-
-                for hora_in in range(hora_inicial, hora_final):
-                    for minuto_in in range(0, 60, 15):
-                        if hora == hora_in and minutos == minuto_in:
-                            nombres_coincidentes.append(nombre)
-            else:
-                nombres_coincidentes.append(nombre)
-
-
-    return nombres_coincidentes
-
 def scatter_with_errorbars(compu_data, list_of_list_of_Obs, show_error_bars=True, xlabel = "datos x", ylabel = "datos y", title = "title" , font_size=16 ):
 
     def calcular_desviacion_estandar(lista, promedio):
@@ -275,7 +248,7 @@ fraction_taco = [i/j for i,j in zip(lista_valores_ultima_columna, maximo_autos_p
 #============================
 #graficar los parametros en el tiempo.
 
-datos_computacionales = lista_de_datos_comp_2
+datos_computacionales = lista_de_datos_comp
 
 #almacenar los resultados
 horas = []
@@ -290,7 +263,7 @@ hora_inicial, hora_final = 0, 24
 
 for hora_in in range(hora_inicial, hora_final):
     for minuto_in in range(0, 60, 15):
-        columnas_elejidas = obtener_nombres_con_H_M(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
+        columnas_elejidas = obtener_nombres_con_H_M_sinFDS(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
         datos_new = datos_obs[columnas_elejidas].values.tolist()
         datos_new_mean = [np.mean(lista) for lista in datos_new]
 
