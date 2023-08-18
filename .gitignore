@@ -11,4 +11,4 @@ src/Funciones/__pycache__
 
 #exceden el maximo de tamaño
 data/DataImages/DataMatrixImages.h5
-data/DataNetwork/StreetAsNode/estado_ejes_500M_10msteps.csv
+data/DataNetwork/StreetAsNode/ComplexNet_states_10mA_500BT_10mS_streets.csv
