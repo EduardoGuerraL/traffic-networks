@@ -166,7 +166,6 @@ class NetworkData:
         df = self.addColumnToDataFrame(df, EdgesDegree, "DC")
 
         return df
-    
 
     # Para mostrar los indices:
     def plotNodes(self, column_name:str, name_to_save_file: str = None, width_node:float = 2):
