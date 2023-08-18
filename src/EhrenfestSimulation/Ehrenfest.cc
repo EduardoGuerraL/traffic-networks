@@ -21,10 +21,13 @@ int main()
 
     //Distribuyendo partículas iniciales:
     vector<int> vector_particulas(num_nodos, 0);
+    
+    // Distribución inicial en una urna:
     //vector_particulas[0] = particulas;
 
-    srand(time(0));
 
+    // Distribución inicial random:
+    srand(time(0));
     int contador = particulas;
     while (contador > 0)
     {
@@ -33,15 +36,7 @@ int main()
         contador--;
 
     }
-
-    // Imprimir el resultado
-    cout << "Estado inicial:" << endl;
-    for (int i = 0; i < 5; i++)
-    {
-        cout << "Nodo " << i << ": " << vector_particulas[i] << " partículas" << endl;
-    }
-    cout << "..." << endl;
-
+   
     // Guardar el estado inicial en un archivo
     ofstream outfile(archivo_guardado_estados);
     if (outfile.is_open())
@@ -56,6 +51,7 @@ int main()
         return 1;
     }
 
+    // Main: Moviendo las partículas
     srand(time(0));
     for (int t = 0; t < tiempo; t++)
     {
