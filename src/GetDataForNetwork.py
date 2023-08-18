@@ -21,33 +21,37 @@ class NetworkData:
             path_dir_network_data (str): Donde se encuentran los datos de posicion y coneccion de la red.
         """
 
-        self.image_no_traffic = plt.imread("data/Images/screenshots/CleanScreenshot.png") #Imagen
+        self.img_without_traffic = plt.imread("data/Images/screenshots/CleanScreenshot.png") #Imagen Google
 
-            # INTERSECCIONES COMO NODOS
-        # Atributos de armado de red.
-        position_of_vertices = eval(open(str(path_dir_network_data)+"/Posiciones.dat", "r").readline())
-        self.position_of_vertices = {} #Posiciones
-        for i, tupla in enumerate(position_of_vertices):
-            self.position_of_vertices[i] = list([tupla[0]*self.image_no_traffic.shape[1], tupla[1]*self.image_no_traffic.shape[0]])        
-        self.conections = eval(open(str(path_dir_network_data)+"/Conexiones.dat", "r").readline()) #Conexiones
-        self.lanes = eval(open(str(path_dir_network_data)+"/Carriles.dat", "r").readline())#Carriles por calle
-        self.dataFrame = pd.DataFrame()
-        self.DiGraph = nx.DiGraph(self.conections)
-        self.conections_diconected = []
-        [self.conections_diconected.append(x) for x in self.conections if x not in self.conections_diconected] #Conexiones_bidireccionadas
-        self.Graph = nx.Graph(self.conections_diconected)
+        # Se le entregan los datos que construimos en NetworkCreator.py
+        pos_vertices = eval(open(str(path_dir_network_data)+"/Posiciones.dat", "r").readline())
+        self.position_of_vertices = {}
+        # Redimensionando al tamaño de la imagen(antes estaba en fracciones de imagen)
+        for i, tupla in enumerate(pos_vertices):
+            self.position_of_vertices[i] = list([tupla[0]*self.img_without_traffic.shape[1], tupla[1]*self.img_without_traffic.shape[0]])        
         
-            # CALLES COMO NODOS
-        self.dataFrameForEdges = pd.DataFrame()
-        #Obtenemos la lista de conecciones como si las calles fueran nodos:
-        self.dict_from_conections_dataFrame =  dict(enumerate(self.conections))
-        self.Conection_between_streets = []
-        for i in range(len(self.dict_from_conections_dataFrame)):
-            for j in range(len(self.dict_from_conections_dataFrame)):
-                if (self.dict_from_conections_dataFrame[i][1]) == self.dict_from_conections_dataFrame[j][0] and j!=i:
-                    self.Conection_between_streets.append((i,j))
-        self.Graph_of_conection_between_streets = nx.DiGraph(self.Conection_between_streets)
+        self.Edges = eval(open(str(path_dir_network_data)+"/Conexiones.dat", "r").readline()) #Conexiones
+        
+        # Creando redes en networkx
+        
+        # Interceccion de calles como nodos 
+        self.DiGraphNodes = nx.DiGraph(self.Edges)
+        self.GraphNodes = nx.Graph(self.Edges)
+        
+        # Calles como nodos.
+        self.lanes = eval(open(str(path_dir_network_data)+"/Carriles.dat", "r").readline())#Carriles por calle
 
+        #Obtenemos la lista de conecciones como si las calles fueran nodos:
+        dict_Edges =  dict(enumerate(self.Edges))
+        self.StreetsNodes = []
+        for i in range(len(dict_Edges)):
+            for j in range(len(dict_Edges)):
+                if (dict_Edges[i][1]) == dict_Edges[j][0] and j!=i:
+                    self.StreetsNodes.append((i,j))
+        
+        self.DiGraphEdges = nx.DiGraph(self.StreetsNodes)
+        self.GraphEdges = nx.Graph(self.StreetsNodes)
+    
     def makeDataFrame(self, dict_to_column: dict, column_name:str, index_name:str = "Nodo"):
         """
         Crea un DataFrame de Pandas con el diccionario que se le entrega.
@@ -63,28 +67,12 @@ class NetworkData:
 
         keys_of_dict = sorted(dict_to_column.keys())
         ordered_values = [dict_to_column[key] for key in keys_of_dict]
-        self.dataFrame = pd.DataFrame({str(index_name): keys_of_dict, str(column_name) : ordered_values})
-        self.dataFrame.set_index(str(index_name), inplace=True)
-
-    def makeDataFrameEdge(self, dict_to_column: dict, column_name:str, index_name:str = "Nodo"):
-        """
-        Crea un DataFrame de Pandas con el diccionario que se le entrega.
-
-        Args: 
-            dict_to_column(dict): Diccionario con el dato de la Red que queremos guardar.
-            column_name(str): Nombre del dato que estamos guardando.
-            index_name(str): Nombre por el cual se le llama al indice de 0 a N.
+        dataFrame = pd.DataFrame({str(index_name): keys_of_dict, str(column_name) : ordered_values})
+        dataFrame.set_index(str(index_name), inplace=True)
         
-        Return:
-            DataFrame de Pandas con una columna de datos.
-        """
-
-        keys_of_dict = sorted(dict_to_column.keys())
-        ordered_values = [dict_to_column[key] for key in keys_of_dict]
-        self.dataFrameForEdges = pd.DataFrame({str(index_name): keys_of_dict, str(column_name) : ordered_values})
-        self.dataFrameForEdges.set_index(str(index_name), inplace=True)
-
-    def addColumnToDataFrame(self, dict_to_add: dict , column_name:str):
+        return dataFrame
+    
+    def addColumnToDataFrame(self, df, dict_to_add: dict , column_name:str, index_name:str = "Nodo"):
         """
         Agrega una columna al dataFrame.
 
@@ -97,28 +85,14 @@ class NetworkData:
         """
         keys_of_dict = sorted(dict_to_add.keys())
         ordered_values = [dict_to_add[key] for key in keys_of_dict]
-        df_to_add = pd.DataFrame({"Nodo": keys_of_dict, str(column_name) : ordered_values})
-        df_to_add.set_index('Nodo', inplace=True)
-        self.dataFrame = pd.concat([self.dataFrame, df_to_add], axis = 1)
+        df_to_add = pd.DataFrame({index_name: keys_of_dict, str(column_name) : ordered_values})
+        df_to_add.set_index(index_name, inplace=True)
+        dataFrame = pd.concat([df, df_to_add], axis = 1)
 
-    def addColumnToDataFrameEdge(self, dict_to_add: dict , column_name:str):
-        """
-        Agrega una columna al dataFrame.
-
-        Args:
-            dataFrame: DataFrame al que agregamos los datos
-            dict_to_add(dict): Datos en forma de diccionario que agregaremos.
-            column_name(str): Nombre de los datos.
-        Return:
-            DataFrame modificado.
-        """
-        keys_of_dict = sorted(dict_to_add.keys())
-        ordered_values = [dict_to_add[key] for key in keys_of_dict]
-        df_to_add = pd.DataFrame({"Nodo": keys_of_dict, str(column_name) : ordered_values})
-        df_to_add.set_index('Nodo', inplace=True)
-        self.dataFrameForEdges = pd.concat([self.dataFrameForEdges, df_to_add], axis = 1)
-
-    def addBasicIndexCentrality(self):
+        return dataFrame
+    
+    #VER LUEGO
+    def getBasicIndexCentrality(self):
         """
         Agrega los indices de centralidad basicos:
         "BC, CC, DC, DiBC, DiCC, DiDC"
@@ -138,6 +112,63 @@ class NetworkData:
         self.addColumnToDataFrame(DiCC, "DiCC")
         self.addColumnToDataFrame(DiDC, "DiDC")
 
+    def getBasicIndexCentralityForEdges(self):
+        """
+        Suponiendo los nodos como las calles:
+        Incluimos en un dataFrame los siguientes datos para cada nodo de la red:
+            -Betwenness centrality
+            -Closeness centrality
+            -Degree centrality
+        """
+
+        #Orden de conexiones que tiene el dataFrame, el cual debemos seguir
+        import ast
+    
+        dict_Edges = dict(enumerate(self.Edges))
+
+        EdgeBetwenness = nx.betweenness_centrality(self.DiGraphEdges)
+        EdgeBetwenness = {clave: valor for clave, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {self.Edges[i]:valor for i, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.Edges)}
+        
+        EdgesCloseness = nx.closeness_centrality(self.DiGraphEdges)
+        EdgesCloseness = {clave: valor for clave, valor in EdgesCloseness.items()}
+        EdgesCloseness = {self.Edges[i]:valor for i, valor in EdgesCloseness.items()}
+        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.Edges)}
+
+        EdgesDegree = nx.degree_centrality(self.DiGraphEdges)
+        EdgesDegree = {clave: valor for clave, valor in EdgesDegree.items()}
+        EdgesDegree = {self.Edges[i]:valor for i, valor in EdgesDegree.items()}
+        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.Edges)}
+
+        df = self.makeDataFrame(dict_Edges, "Conections")
+        df = self.addColumnToDataFrame(df, EdgeBetwenness, "DiBC")
+        df = self.addColumnToDataFrame(df, EdgesCloseness, "DiCC")
+        df = self.addColumnToDataFrame(df, EdgesDegree, "DiDC")
+
+        EdgeBetwenness = nx.betweenness_centrality(self.GraphEdges)
+        EdgeBetwenness = {clave: valor for clave, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {self.Edges[i]:valor for i, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.Edges)}
+        
+        EdgesCloseness = nx.closeness_centrality(self.GraphEdges)
+        EdgesCloseness = {clave: valor for clave, valor in EdgesCloseness.items()}
+        EdgesCloseness = {self.Edges[i]:valor for i, valor in EdgesCloseness.items()}
+        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.Edges)}
+
+        EdgesDegree = nx.degree_centrality(self.GraphEdges)
+        EdgesDegree = {clave: valor for clave, valor in EdgesDegree.items()}
+        EdgesDegree = {self.Edges[i]:valor for i, valor in EdgesDegree.items()}
+        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.Edges)}
+
+        df = self.addColumnToDataFrame(df, EdgeBetwenness, "BC")
+        df = self.addColumnToDataFrame(df, EdgesCloseness, "CC")
+        df = self.addColumnToDataFrame(df, EdgesDegree, "DC")
+
+        return df
+    
+
+    # Para mostrar los indices:
     def plotNodes(self, column_name:str, name_to_save_file: str = None, width_node:float = 2):
         """
         Crea, guarda y muestra los indices que queremos ver(que esten en el dataFrame) en la ciudad.
@@ -151,7 +182,7 @@ class NetworkData:
         """
 
         fig, ax = plt.subplots()
-        ax.imshow(self.image_no_traffic)
+        ax.imshow(self.img_without_traffic)
 
         #Indice que graficaremos
         indice = list(self.dataFrame[str(column_name)])
@@ -195,7 +226,7 @@ class NetworkData:
         Desviaciones_estandar = [math.sqrt(N * (p - p**2)) for p in Probabilidad]
 
     def eherenfestSimulation(self, N_particulas,Tiempo):
-        Adjacency_matrix = np.array(nx.adjacency_matrix(self.Graph_of_conection_between_streets, nodelist=sorted(self.Graph_of_conection_between_streets.nodes())).todense())
+        Adjacency_matrix = np.array(nx.adjacency_matrix(self.DiGraphEdges, nodelist=sorted(self.DiGraphEdges.nodes())).todense())
         return Adjacency_matrix
         
         """
@@ -221,74 +252,6 @@ class NetworkData:
         
         print(NP_NODOS)
         """
-
-    def addBasicIndexCentralityForEdges(self):
-        """
-        Incluimos en un dataFrame los diguientes datos para cada nodo de la red:
-            -Edge Betwenness centrality (función que viene en nx)
-            -Betwenness centrality**
-            -Closeness centrality**
-            -Degree centrality**
-        **Los ultimos 3 son para nodos, pero habiendo dado como nodo a las calles.
-        """
-        def son_listas_de_tuplas_iguales(lista1, lista2):
-            if len(lista1) != len(lista2):
-                return False
-            
-            for tupla in lista1:
-                if tupla not in lista2:
-                    return False
-            
-            for tupla in lista2:
-                if tupla not in lista1:
-                    return False
-            
-            return True
-        #Orden de conexiones que tiene el dataFrame, el cual debemos seguir
-        import ast
-    
-    
-        orden_conecciones_en_dataFrame = self.conections
-        dict_from_conections_dataFrame = dict(enumerate(self.conections))
-
-        #Obtener EdgeBetwennes de la forma convencional
-        GrafoWNormalConex = nx.DiGraph(orden_conecciones_en_dataFrame)
-        EdgeBetwenness_convencional = nx.edge_betweenness_centrality(GrafoWNormalConex)
-        EdgeBetwenness_convencional = {clave: round(valor, 5) for clave, valor in EdgeBetwenness_convencional.items()}
-        EdgeBetwenness_convencional = {index : EdgeBetwenness_convencional[clave] for index, clave in enumerate(orden_conecciones_en_dataFrame)}
-
-
-            #CENTRALIDAD CON FORMA NO CONVENCIONAL
-        #Obtenemos la lista de conecciones como si las calles fueran nodos:
-        Conection_between_streets = []
-        for i in range(len(dict_from_conections_dataFrame)):
-            for j in range(len(dict_from_conections_dataFrame)):
-                if (dict_from_conections_dataFrame[i][1]) == dict_from_conections_dataFrame[j][0] and j!=i:
-                    Conection_between_streets.append((i,j))
-        #Calculo de los indices de centralidad:
-        Graph_of_conection_between_streets = nx.DiGraph(Conection_between_streets)
-        
-        new_streets_Betwenness = nx.betweenness_centrality(Graph_of_conection_between_streets)
-        new_streets_Betwenness = {clave: round(valor, 5) for clave, valor in new_streets_Betwenness.items()}
-        new_streets_Betwenness = {orden_conecciones_en_dataFrame[i]:valor for i, valor in new_streets_Betwenness.items()}
-        new_streets_Betwenness = {index : new_streets_Betwenness[clave] for index, clave in enumerate(orden_conecciones_en_dataFrame)}
-        
-        new_streets_Closeness = nx.closeness_centrality(Graph_of_conection_between_streets)
-        new_streets_Closeness = {clave: round(valor, 5) for clave, valor in new_streets_Closeness.items()}
-        new_streets_Closeness = {orden_conecciones_en_dataFrame[i]:valor for i, valor in new_streets_Closeness.items()}
-        new_streets_Closeness = {index : new_streets_Closeness[clave] for index, clave in enumerate(orden_conecciones_en_dataFrame)}
-
-        new_streets_Degree = nx.degree_centrality(Graph_of_conection_between_streets)
-        new_streets_Degree = {clave: round(valor, 5) for clave, valor in new_streets_Degree.items()}
-        new_streets_Degree = {orden_conecciones_en_dataFrame[i]:valor for i, valor in new_streets_Degree.items()}
-        new_streets_Degree = {index : new_streets_Degree[clave] for index, clave in enumerate(orden_conecciones_en_dataFrame)}
-        
-
-        self.makeDataFrameEdge(dict_from_conections_dataFrame, "conecciones")
-        self.addColumnToDataFrameEdge(EdgeBetwenness_convencional, "Betweenness_nx")
-        self.addColumnToDataFrameEdge(new_streets_Betwenness, "Betweenness_streets")
-        self.addColumnToDataFrameEdge(new_streets_Closeness, "Closeness_streets")
-        self.addColumnToDataFrameEdge(new_streets_Degree, "Degree_streets")
 
     def ehrenfestSimulationWithBounded(self, cantidad_particulas, iteraciones, dataFrameLessOne = None):
 
@@ -351,9 +314,9 @@ class NetworkData:
         
         # Obteniendo los datos para la simulación
         new_position_of_vertices = self.position_of_vertices
-        Adjacency_matrix = np.array(nx.adjacency_matrix(self.Graph_of_conection_between_streets, nodelist=sorted(self.Graph_of_conection_between_streets.nodes())).todense())
+        Adjacency_matrix = np.array(nx.adjacency_matrix(self.DiGraphEdges, nodelist=sorted(self.DiGraphEdges.nodes())).todense())
 
-        largo_de_calles = long_of_streets(new_position_of_vertices, self.dict_from_conections_dataFrame)
+        largo_de_calles = long_of_streets(new_position_of_vertices, dict_Edges)
         cantidad_de_autos_por_calle = [round(largo*1.876) for largo in largo_de_calles]
         N_autos_por_calle_por_pistas = [i*j for i,j in zip(cantidad_de_autos_por_calle,self.lanes)]
 
@@ -376,7 +339,7 @@ class NetworkData:
             return list(lenghts.values())
 
         new_position_of_vertices = self.position_of_vertices
-        largo_de_calles = long_of_streets(new_position_of_vertices, self.dict_from_conections_dataFrame)
+        largo_de_calles = long_of_streets(new_position_of_vertices, dict_Edges)
         cantidad_de_autos_por_calle = [round(largo*1.876) for largo in largo_de_calles]
         N_autos_por_calle_por_pistas = [i*j for i,j in zip(cantidad_de_autos_por_calle,self.lanes)]
      
@@ -452,22 +415,13 @@ def getdfStreetsNetworkBasics_detallado():
 
 if __name__ == "__main__":
     
-    ehrenfest_sim_percent()
-    
-    #ehrenfest_sim(primero=True, iteraciones=200)
-    #for _ in range(2000):
-     #  ehrenfest_sim(primero=False, iteraciones=1000)
-    
-    #for i in range(1,1200, 63):
-     #   graph(i)
-    
-    #datos = "data/DataMakeNetwork/PuntaArenas"
-    #puntaArenas = NetworkData(datos)
-
-    #datos = puntaArenas.eherenfestSimulation(10,10)
-    #np.savetxt("matriz_A_ejes.txt", datos)
-    
-    #puntaArenas.ehrenfestAnalitic()
-    #data  = getdfStreetsNetworkBasics_detallado()
-    #print(data)
-    #data.to_csv("Basic_and_advaced_data_network_aristas_detallado.csv")
+    path_network_info = "data/DataMakeNetwork/PuntaArenasDetallado"
+    PuntaArenasDetallado = NetworkData(path_network_info)
+    df = PuntaArenasDetallado.getBasicIndexCentralityForEdges()
+    print(df)
+    df.to_csv("Detallado_IndicesCentralidad.csv")
+    path_network_info = "data/DataMakeNetwork/PuntaArenas"
+    PuntaArenas = NetworkData(path_network_info)
+    df = PuntaArenas.getBasicIndexCentralityForEdges()
+    print(df)
+    df.to_csv("Simple_IndicesCentralidad.csv")
