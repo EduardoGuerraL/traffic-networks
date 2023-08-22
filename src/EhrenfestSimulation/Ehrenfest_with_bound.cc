@@ -18,9 +18,9 @@ int main()
     int particulas = 10000; //Número de paquetes/partículas constantes
     int tiempo = 500000000;  //Número de movimientos/Tiempo
 
-    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/adj_matrix_simpleNet_streets.txt";
-    string archivo_tope_de_calles = "data/DataNetwork/StreetAsNode/Max_ocupation_per_streets_simple.txt";
-    string archivo_guardado_estados = "states_10mA_500BT_10mS_streets_simple.txt";
+    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/txtes/ComplexNet_adjMatrix.txt";
+    string archivo_tope_de_calles = "data/DataNetwork/StreetAsNode/txtes/ComplexNet_max_ocupation_per_streets.txt";
+    string archivo_guardado_estados = "ComplexNet_Ehr_10mA_500MT_UpperLimit.txt";
 
     Matriz<double> Adjacency(archivo_matriz_adjacencia);
     ifstream archivo_tope(archivo_tope_de_calles); // Abre el archivo para lectura

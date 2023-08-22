@@ -36,7 +36,7 @@ def csv_to_txt(archivo_entrada, archivo_salida):
     with open(archivo_salida, 'w') as txtfile:
         txtfile.write(cadena_valores)
 
-def txt_to_csv(archivo_entrada, archivo_salida,steps):
+def txt_to_csv(archivo_entrada, archivo_salida, steps):
     """
     Convierte la salida de Random Walk a un csv compatible con las
     demás funciones.
@@ -241,3 +241,6 @@ def graph_ocupation_randomWalk_to_node(file_states_for_RW, file_max_ocupation, i
 
     plt.tight_layout()  # Elimina espacios en los bordes
     plt.show()
+
+
+txt_to_csv("data/DataNetwork/StreetAsNode/ResultData/SimpleNet_EhrMod_10mA_500MT.txt", "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_EhrMod_10mA_500MT.csv", 10000)

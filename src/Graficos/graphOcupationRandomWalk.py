@@ -10,7 +10,7 @@ def graph(indice_i):
     
     # Datos de red Detallada
     df = pd.read_csv("data/DataNetwork/StreetAsNode/estado_ejes_500M_10msteps.csv")
-    df_max = pd.read_csv("data/DataNetwork/StreetAsNode/ComplexNet_Max_ocupation_per_strets.csv")
+    df_max = pd.read_csv("data/DataNetwork/StreetAsNode/SimpleNet_max_ocupation_per_streets.csv")
 
     # Seleccionar la columna del índice específico
     data_street = df.iloc[indice_i][1:]

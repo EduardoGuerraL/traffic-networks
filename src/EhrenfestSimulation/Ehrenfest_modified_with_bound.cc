@@ -17,9 +17,9 @@ int main()
 {
     int particulas = 10000; //Número de paquetes/partículas constantes
     int tiempo = 500000000;  //Número de movimientos/Tiempo
-    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/SimpleNet_adjMatrix.txt";
-    string archivo_guardado_estados = "SimpleNet_EhrMod_10mA_500MT_UpperLimit.txt";
-    string file_upper_limit_nodes = "data/DataNetwork/StreetAsNode/SimpleNet_max_ocupation_per_streets.txt";
+    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/txtes/ComplexNet_adjMatrix.txt";
+    string archivo_guardado_estados = "ComplexNet_EhrMod_10mA_500MT_UpperLimit.txt";
+    string file_upper_limit_nodes = "data/DataNetwork/StreetAsNode/txtes/ComplexNet_max_ocupation_per_streets.txt";
 
     Matriz<double> Adjacency(archivo_matriz_adjacencia);
     int num_nodos = Adjacency.columnas();
@@ -64,7 +64,7 @@ int main()
 
     // Guardar el estado inicial en un archivo
     ofstream outfile(archivo_guardado_estados);
-
+    
     // Main: Moviendo las partículas
     srand(time(0));
     for (int t = 0; t < tiempo; t++)
