@@ -38,7 +38,7 @@ def plot_distribution(data):
     plt.show()
 
 
-#Simple
+#Simple 
 
 data = pd.read_csv("data/DataNetwork/InterAsNode/Basic_and_advaced_data_network_nodes.csv")
 
