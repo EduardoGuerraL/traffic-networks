@@ -20,3 +20,9 @@ Este repositorio contiene datos y código relacionados con el análisis del trá
 ## Instrucciones de Uso
 
 A continuación, se proporcionan instrucciones básicas para comenzar a trabajar con este repositorio:
+
+1. En *src/Packages/GoogleScreenshot* podemos obtener imagenes del trafico vehicular dando las coordenadas de la ciudad que elegimos. Estas son tomadas cada cuarto de hora por el tiempo que se desee.
+2. Con al menos una imagen, podemos crear una red direccionada en *src/Packages/NetworkCreator.py* tomando las intersecciones como nodos y las calles como links. Puede ser tan detallado como se desee. Si se les ocurre otra forma de ver los nodos y links también podria implementarse.
+3. Con  *src/Packages/GetDataFromImages.py* podemos convertir las imagenes a matrices de pixeles y linealizando podemos ver cada coordenada como un grado de trafico. Así obtenemos luego un grado de trafico para cada uno de los nodos que cremaos en 2.
+4. En *src/Packages/GetDataForNetwork.py* Obtenemos algunas caracteristicas de la red que creamos en 2, además se agregan algunas simulaciones de random walk.
+5. En la seccion principal hay varios graficos que estan siendo creados para poder visualizar los datos.
