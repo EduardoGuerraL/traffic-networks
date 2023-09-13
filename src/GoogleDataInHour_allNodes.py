@@ -61,13 +61,6 @@ def graficar_listas_en_columnas(lista_de_listas):
 #observacional
 datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv")
 
-#computacional
-
-datos_comp = pd.read_csv("data/DataNetwork/StreetAsNode/Basic_and_advaced_data_network_aristas_detallado.csv")
-lista_de_datos_comp = datos_comp["Betweenness_streets"].tolist()
-lista_de_datos_comp_2 = datos_comp["Closeness_streets"].tolist()
-lista_de_datos_comp_3 = datos_comp["Degree_streets"].tolist()
-
 
 columnas_elejidas = obtener_nombres_con_H_M_sinFDS(datos_obs.columns, hora_exacta=(8, 30))
 datos_new = datos_obs[columnas_elejidas].values.tolist()

@@ -28,7 +28,7 @@ def save_state_with_filename(state_filename, nodes, links, lanes, action_history
 
 def crear_guardar_datos_en_carpeta(name, Posiciones, Conexiones, Carriles):
         #creamos carpeta
-        nombre_carpeta = "data/fromMakeNet/"
+        nombre_carpeta = "data/DataMakeNetwork/"
         if not os.path.isdir(str(nombre_carpeta) + str(name)):
             print('No existe, se crea')
             os.mkdir(str(nombre_carpeta) + str(name))

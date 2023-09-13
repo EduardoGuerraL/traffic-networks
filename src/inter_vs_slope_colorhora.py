@@ -6,8 +6,40 @@ import re
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import statistics
+from datetime import datetime
 
-from Funciones.functions import obtener_nombres_con_H_M_sinFDS
+
+def obtener_nombres_con_H_M_sinFDS(lista_nombres,  hora_exacta=None, rango_horas=None):
+    nombres_coincidentes = []
+    patron = r"/\d{4}-\d{2}-\d{2}_\d{2}-\d{2}(?:\.png)?"
+
+    for nombre in lista_nombres:
+        match = re.search(patron, nombre)
+        if match:
+            fecha_str = match.group(0).split(".")[0].split("/")[1]
+            fecha = datetime.strptime(fecha_str, "%Y-%m-%d_%H-%M")
+
+            hora_minutos_str = match.group(0).split(".")[0].split("_")[1]
+            hora = int(hora_minutos_str.split("-")[0])
+            minutos = int(hora_minutos_str.split("-")[1])
+
+            if fecha.weekday() < 5:
+                if hora_exacta is not None:
+                    if hora == hora_exacta[0] and minutos == hora_exacta[1]:
+                        nombres_coincidentes.append(nombre)
+                elif rango_horas is not None:
+                    hora_inicial = rango_horas[0]
+                    hora_final = rango_horas[1]
+
+                    for hora_in in range(hora_inicial, hora_final):
+                        for minuto_in in range(0, 60, 15):
+                            if hora == hora_in and minutos == minuto_in:
+                                nombres_coincidentes.append(nombre)
+                else:
+                    nombres_coincidentes.append(nombre)
+
+
+    return nombres_coincidentes
 
 # Función para convertir la hora en formato string a float
 def convertir_hora(hora_string):
@@ -22,30 +54,40 @@ def convertir_hora(hora_string):
 # NETWORK SIMPLE
 
 # observacional
-datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Normal/streetsCoordsR1S4.csv")
+datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv")
 #computacional
-datos_comp = pd.read_csv("data/DataNetwork/StreetAsNode/Basic_and_advaced_data_network_aristas.csv")
-lista_de_datos_comp_2 = datos_comp["Closeness_streets"].tolist()
-lista_de_datos_comp = datos_comp["Betweenness_streets"].tolist()
-lista_de_datos_comp_3 = datos_comp["Degree_streets"].tolist()
-
-
-# RANDOM WALK
-datos_sim = pd.read_csv("data/DataNetwork/StreetAsNode/Simple_states_10mA_500BT_10mS_streets.csv")
-lista_valores_ultima_columna = datos_sim[datos_sim.columns[-1]].tolist()
-
-maximo_autos_por_calle = pd.read_csv("data/DataNetwork/StreetAsNode/Simple_max_ocupation_per_streets.csv")
-maximo_autos_por_calle = maximo_autos_por_calle[maximo_autos_por_calle.columns[-1]].tolist()
-
-fraction_taco = [i/j for i,j in zip(lista_valores_ultima_columna, maximo_autos_por_calle)]
-
+data = pd.read_csv("data/DataNetwork/StreetAsNode/all_data_ComplexNet_new.csv")
+BC = data["BC"]
+CC = data["CC"]
+DC = data["DC"]
+DiBC = data["DiBC"]
+DiCC = data["DiCC"]
+DiDC = data["DiDC"]
+Max_ocupation = data["MaxOcupation"]
+mean_rw = data["mean_state_RW"]
+mean_rwm = data["mean_state_RWM"]
+mean_rw_uplim = data["mean_state_RW_lim"]
+mean_rwm_uplim = data["mean_state_RWM_lim"]
 
 # Graficando 
 #============================
 #graficar los parametros en el tiempo.
 
+#datos_computacionales = CC
+#datos_computacionales = BC
+#datos_computacionales = DC
+#datos_computacionales = DiBC
+#datos_computacionales = DiCC
+#datos_computacionales = DiDC
+#datos_computacionales = Max_ocupation
+#datos_computacionales = mean_rw 
+#datos_computacionales = mean_rwm
+#datos_computacionales = mean_rw_uplim
+datos_computacionales = mean_rwm_uplim
 
-datos_computacionales = fraction_taco
+#name = r"N_{max}"
+
+name = r"\langle N_{rwm(lim)} \rangle"
 
 horas = []
 MAE = []
@@ -56,7 +98,6 @@ std_devs = []
 r2_values = []
 r2_values_ajust = []
 hora_inicial, hora_final = 0, 24
-
 promedio_ocupacion_total = []
 
 for hora_in in range(hora_inicial, hora_final):
@@ -129,7 +170,7 @@ cbar.set_label('mean total ocupation',  fontsize=20)
 # Etiquetas y título
 plt.xlabel(r'$m$',  fontsize=20)
 plt.ylabel(r'$b$',  fontsize=20)
-plt.title(r'$Random Walk$',  fontsize=20)
+plt.title(rf'${name}$',  fontsize=20)
 
 
 plt.xticks(fontsize=15)
@@ -146,7 +187,7 @@ plt.tight_layout()
 # Mostrar el gráfico
 plt.show()
 
-
+"""
 
 # NETWORK COMPLEJA
 
@@ -276,3 +317,5 @@ plt.tight_layout()
 # Mostrar el gráfico
 plt.show()
 
+
+"""

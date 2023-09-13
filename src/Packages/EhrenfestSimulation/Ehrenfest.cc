@@ -13,8 +13,8 @@ int main()
 {
     int particulas = 10000; //Número de paquetes/partículas constantes
     int tiempo = 500000000;  //Número de movimientos/Tiempo
-    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/txtes/ComplexNet_adjMatrix.txt";
-    string archivo_guardado_estados = "ComplexNet_Ehr_10mA_500MT.txt";
+    string archivo_matriz_adjacencia = "data/DataNetwork/StreetAsNode/txtes/SimpleNet_adjMatrix.txt";
+    string archivo_guardado_estados = "SimpleNet_Ehr_10mA_500MT.txt";
 
     Matriz<double> Adjacency(archivo_matriz_adjacencia);
     int num_nodos = Adjacency.columnas();

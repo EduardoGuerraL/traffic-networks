@@ -74,6 +74,7 @@ new.to_csv("data/DataNetwork/StreetAsNode/ResultData/All_data_ComplexNet.csv")
 
 
 sp = "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_Ehr_10mA_500MT.csv"
+"""
 sp_lim = "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_Ehr_10mA_500MT_UpperLimit.csv"
 
 sp_mod = "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_EhrMod_10mA_500MT.csv"
@@ -83,35 +84,41 @@ sp_centrality = "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_IndicesCentr
 
 sp_max_ocupation = "data/DataNetwork/StreetAsNode/ResultData/SimpleNet_max_ocupation_per_streets.csv"
 
-datasp = pd.read_csv(sp)
-datasp_lim = pd.read_csv(sp_lim)
 datasp_mod = pd.read_csv(sp_mod)
 datasp_mod_lim = pd.read_csv(sp_mod_lim)
 datasp_centrality = pd.read_csv(sp_centrality)
 datasp_max_ocupation = pd.read_csv(sp_max_ocupation)
+datasp_lim = pd.read_csv(sp_lim)
 
-sp_alldata = "data/DataNetwork/StreetAsNode/All_data_ComplexNet.csv"
+"""
+datasp = pd.read_csv(sp)
+
+sp_alldata = "data/DataNetwork/StreetAsNode/all_data_SimpleNet_new.csv"
 datasp_alldata = pd.read_csv(sp_alldata)
 
 df_mean = datasp.mean(axis=1)
 datasp_alldata["mean_state_RW"] = df_mean
+"""
 df_mean = datasp_lim.mean(axis=1)
 datasp_alldata["mean_state_RW_lim"] = df_mean
 df_mean = datasp_mod.mean(axis=1)
 datasp_alldata["mean_state_RWM"] = df_mean
 df_mean = datasp_mod_lim.mean(axis=1)
 datasp_alldata["mean_state_RWM_lim"] = df_mean
+"""
 
 datasp_alldata.to_csv("all_data_SimpleNet_new.csv")
+
+
 """
 print(datasp_centrality.info())
 new1 = agregar_columna(datasp_centrality, datasp[datasp.columns[-1]], "state RW")
-new1= agregar_columna(new, datasp_lim[datasp_lim.columns[-1]], "state_RW_UL")
-new1 = agregar_columna(new, datasp_mod[datasp_mod.columns[-1]], "state_RWM")
-new1 = agregar_columna(new, datasp_mod_lim[datasp_mod_lim.columns[-1]], "state_RWM_UL")
-new1 = agregar_columna(new, datasp_max_ocupation[datasp_max_ocupation.columns[-1]], "MaxOcupation")
+new1= agregar_columna(new1, datasp_lim[datasp_lim.columns[-1]], "state_RW_UL")
+new1 = agregar_columna(new1, datasp_mod[datasp_mod.columns[-1]], "state_RWM")
+new1 = agregar_columna(new1, datasp_mod_lim[datasp_mod_lim.columns[-1]], "state_RWM_UL")
+new1 = agregar_columna(new1, datasp_max_ocupation[datasp_max_ocupation.columns[-1]], "MaxOcupation")
 print(new1.info())
 
 new1.to_csv("data/DataNetwork/StreetAsNode/ResultData/All_data_SimpleNet.csv")
-
 """
+
