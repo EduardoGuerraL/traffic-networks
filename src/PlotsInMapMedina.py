@@ -13,3 +13,5 @@ if __name__ == "__main__":
 
     Matrix_Adj_edges = Medina.getAdjacencyMatrix()[1]
     #print(Matrix_Adj_edges)
+
+print("HOla")
