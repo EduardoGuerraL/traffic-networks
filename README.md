@@ -1,22 +1,22 @@
-# FinalVersion
-El objetivo es analizar el trafico vehicular de una ciudad y buscar una caracteristica de la red de la ciudad que se acerque al comportamiento de la vida real.
+# Repositorio de Análisis de Tráfico Vehicular
 
-## Screenshot.py
+Este repositorio contiene datos y código relacionados con el análisis del tráfico vehicular. A continuación, se describe la estructura de carpetas y el contenido del repositorio.
 
-Esto nos sirve para comenzar a obtener imagenes de la ciudad que deseemos. Las capturas son cada 15min.
+## Contenido del Repositorio
 
-## NetworkCreator.py
+1. **data**: En esta carpeta se encuentran los datos utilizados en el análisis. Está subdividida en tres subcarpetas:
 
-Es una ventana interactiva donde elegimos una imagen de la ciudad y comenzamos a crear los nodos y links de anera manual. 
+   - **DataImages**: Contiene datos de imágenes en formato de píxeles para su procesamiento.
+   - **DataMakeNetwork**: Aquí se almacenan las redes vehiculares creadas manualmente en */NetworkCreator.py*.
+   - **DataNetwork**: Esta subcarpeta contiene datos relacionados con las características de las redes vehiculares creadas a mano.
 
-## getDataFromImages.py
+2. **src**: En esta carpeta se encuentra el código fuente utilizado para analizar el tráfico vehicular. Está subdividida en dos subcarpetas:
 
-Con esto obtenemos un dataFrame que contiene los valores convertidos de 0 a 255 para los pixels en las coordenadas de los nodos. 
+   - **Packages**: Contiene paquetes y módulos con funciones y clases específicas para el análisis de tráfico.
+   - Archivos `.py`: Estos archivos contienen código que genera gráficos y visualizaciones relacionados con el análisis de tráfico.
 
-## getDataForNetwork.py
+3. **.gitignore**: Este archivo especifica qué archivos y carpetas se deben ignorar al realizar seguimiento con Git. Asegura que los archivos generados automáticamente o archivos sensibles no se incluyan en el repositorio.
 
-Para obtener los indices de centralidad de la red o el estado asintótico de Ehrenfest. Con el timepo podemos ir calculando nuevos paramentros para incluir en la comparación.
+## Instrucciones de Uso
 
-## DataComparator.py
-
-Compara los datos correspondientes a las imagenes (datos observacionales) con los datos que obtenemos de la red (datos computacionales).
+A continuación, se proporcionan instrucciones básicas para comenzar a trabajar con este repositorio:
