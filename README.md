@@ -1,3 +1,4 @@
+# Repoitorio se encuentra en proceso de construccion
 # Repositorio de Análisis de Tráfico Vehicular
 
 Este repositorio contiene datos y código relacionados con el análisis del tráfico vehicular. A continuación, se describe la estructura de carpetas y el contenido del repositorio.
