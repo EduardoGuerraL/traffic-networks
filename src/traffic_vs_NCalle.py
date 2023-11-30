@@ -7,7 +7,7 @@ import numpy as np
 Dado un limite inferior(threshold), muestra como es el promedio(negro) de cada calle para cierta hora especifica.
 """
 
-Threshold = 150
+Threshold = 100
 
 def apply_threshold(lista_de_listas, N):
     # Recorremos todas las listas en la lista de listas

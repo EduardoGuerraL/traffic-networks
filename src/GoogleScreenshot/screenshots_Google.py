@@ -51,5 +51,4 @@ def take_clean_screenshot(direccion_guardar_imagenes):
 
 
 if __name__ == '__main__':
-    take_clean_screenshot("")
-    take_clean_screenshot("")
+    take_clean_screenshot("probando")

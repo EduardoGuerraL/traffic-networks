@@ -130,73 +130,7 @@ def min_max_scaling(data):
     scaled_data = [(x - min_val) / (max_val - min_val) for x in data]
     return scaled_data
 
-def Super_funcion():
-
-    columnas_elejidas = obtener_nombres_con_H_M(datos_obs.columns, rango_horas=(7, 22))
-    datos_new = datos_obs[columnas_elejidas].values.tolist()
-    scatter_with_errorbars(lista_de_datos_comp, datos_new, ylabel= "Red Pixel Intensity", xlabel="BC", title="range hour = 7-22", show_error_bars=False)
-
-    columnas_elejidas = obtener_nombres_con_H_M(datos_obs.columns)
-    datos_new = datos_obs[columnas_elejidas].values.tolist()
-    scatter_with_errorbars(lista_de_datos_comp, datos_new, ylabel= "Red Pixel Intensity", xlabel="BC", title="total data",show_error_bars=False)
-
-
-    #almacenar los resultados
-    horas = []
-    mae_values = []
-    r2_values = []
-    hora_inicial, hora_final = 0, 24
-
-    for hora_in in range(hora_inicial, hora_final):
-        for minuto_in in range(0, 60, 15):
-            columnas_elejidas = obtener_nombres_con_H_M(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
-            datos_new = datos_obs[columnas_elejidas].values.tolist()
-            scatter_with_errorbars(lista_de_datos_comp, datos_new, ylabel= "Red Pixel Intensity", xlabel="BC", title="hour = "+str(hora_in)+":"+str(minuto_in), show_error_bars=True)
-
-            # Calcular el promedio de cada sublista en lista_de_datos_comp
-            datos_new = [np.mean(datos) for datos in datos_new]
-
-            datos_new = min_max_scaling(datos_new)
-            lista_de_datos_comp = min_max_scaling(lista_de_datos_comp)
-            # Calcular el MAE y el R2
-            mae = mean_absolute_error(lista_de_datos_comp, datos_new)
-            r2 = r2_score(lista_de_datos_comp, datos_new)
-
-            # Agregar los resultados a las listas
-            horas.append(f"{hora_in}")
-            mae_values.append(mae)
-            r2_values.append(r2)
-
-
-    # Graficar los resultados en dos ejes y con diferentes colores
-    fig, ax1 = plt.subplots(figsize=(10, 6))
-
-    color = 'tab:red'
-    ax1.set_xlabel('Horas')
-    ax1.set_ylabel('MAE', color=color)
-    ax1.plot(horas, mae_values, label='MAE', color=color, marker='o')
-    ax1.tick_params(axis='y', labelcolor=color)
-    ax1.grid()
-
-    ax2 = ax1.twinx()  # Crear un segundo eje y
-
-    color = 'tab:blue'
-    ax2.set_ylabel('R2', color=color)
-    ax2.plot(horas, r2_values, label='R2', color=color, marker='x')
-    ax2.tick_params(axis='y', labelcolor=color)
-
-    # Ajustar los ticks del eje x (horas) para que aparezcan solo cada 4 valores
-    x_ticks_step = 4
-    plt.xticks(range(0, len(horas), x_ticks_step), horas[::x_ticks_step], rotation=45)
-
-    plt.title('MAE y R2 por Hora')
-    plt.tight_layout()
-    plt.show()
-
-    plt.title('MAE y R2 por Hora')
-    plt.tight_layout()
-    plt.show()
-
+"""
 #NETWORK SIMPLE 
 
 #INTERSECCIONES
@@ -234,6 +168,7 @@ lista_de_datos_comp_2 = datos_comp["Closeness_streets"].tolist()
 lista_de_datos_comp = datos_comp["Betweenness_streets"].tolist()
 lista_de_datos_comp_3 = datos_comp["Degree_streets"].tolist()
 
+"""
 ###################################################################################################################################
 
 
@@ -269,7 +204,7 @@ lista_de_datos_comp_2 = datos_comp["Closeness_streets"].tolist()
 lista_de_datos_comp = datos_comp["Betweenness_streets"].tolist()
 lista_de_datos_comp_3 = datos_comp["Degree_streets"].tolist()
 
-
+"""
 "ehrenfest sim"
 datos_sim = pd.read_csv("data/DataNetwork/StreetAsNode/estado_ejes_500M_10msteps.csv")
 lista_valores_ultima_columna = datos_sim[datos_sim.columns[-1]].tolist()
@@ -281,10 +216,11 @@ print(maximo_autos_por_calle)
 
 fraction_taco = [i/j for i,j in zip(lista_valores_ultima_columna, maximo_autos_por_calle)]
 print(fraction_taco)
+"""
 
 
 x_label = "fill fraction"
-datos_computacionales = fraction_taco
+datos_computacionales = lista_de_datos_comp
 
 columnas_elejidas = obtener_nombres_con_H_M(datos_obs.columns, rango_horas=(7, 22))
 datos_new = datos_obs[columnas_elejidas].values.tolist()
