@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from Packages.Funciones.functions import obtener_nombres_con_H_M_sinFDS
+from functions.basics import *
 import os
 import scipy
 
