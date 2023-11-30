@@ -1,6 +1,11 @@
 #Ignota lo que está en temp
 data/Images
 
+#Ignorar los datos de Thresholds
+Threshold*
+
+*.png
+
 data/DataNetwork/InterAsNode
 data/DataNetwork/StreetAsNode/ResultData
 data/DataNetwork/StreetAsNode/txtes
