@@ -1,21 +1,17 @@
+"""
+Muestra la distribucion de datos (intensidad de trafico promedio de cada calle)
+
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import skew, kurtosis
 import pandas as pd
-from functions.basics import *
-
-def reescalar_lista_de_listas(lista_de_listas, maximo):
-
-    lista_reescalada = []
-
-    for lista in lista_de_listas:
-        lista_reescalada.append([valor / maximo for valor in lista])
-
-    return lista_reescalada
+from functions.basics import reescalar_lista_de_listas, obtener_nombres_con_H_M_sinFDS, plot_distribution
+from functions.RutasDeArchivos import Datos_observacionales
 
 # Generar datos de una distribución normal
 
-datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv")
+datos_obs = pd.read_csv(Datos_observacionales[0])
 
 hora_inicial, hora_final = 0, 24
 for hora_in in range(hora_inicial, hora_final):
@@ -29,12 +25,7 @@ for hora_in in range(hora_inicial, hora_final):
 
         data = [np.mean(data) for data in data_observacional]
 
-        # Visualizar el histograma de la distribución
-        plt.hist(data, bins=30, density=True, alpha=0.5, color='blue')
-        plt.title('Distribución Normal')
-        plt.xlabel('Valores')
-        plt.ylabel('Frecuencia')
-        plt.show()
+        plot_distribution(data, name = "TI")
 
         # Calcular algunos estadísticos
         percentiles = np.percentile(data, [25, 50, 75, 90, 95])

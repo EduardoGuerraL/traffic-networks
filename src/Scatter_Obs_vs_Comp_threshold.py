@@ -1,20 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from functions.basics import *
-import os
+from functions.basics import CrearCarpeta, apply_threshold, obtener_nombres_con_H_M_sinFDS
 import scipy
-
-def CrearCarpeta(nombre_carpeta):
-    # Ruta completa donde deseas crear la carpeta
-    ruta_completa = os.path.join(os.getcwd(), nombre_carpeta)
-
-    # Verifica si la carpeta no existe antes de crearla
-    if not os.path.exists(ruta_completa):
-        os.makedirs(ruta_completa)
-        print(f"Se ha creado la carpeta '{nombre_carpeta}' en '{ruta_completa}'")
-    else:
-        pass
+from functions.RutasDeArchivos import Datos_computacionales, Datos_observacionales
 
 def scatter_with_errorbars_MeanStdDev(compu_data, list_of_list_of_Obs, carpetaSup, show_error_bars=True, xlabel = "datos x", ylabel = "datos y", title = "title" , font_size=16):
 
@@ -197,31 +186,13 @@ def scatter_with_errorbars_Max(compu_data, list_of_list_of_Obs,carpetaSup, show_
 
     return slope, intercept, r_value, p_value, std_err
 
-def apply_threshold(lista_de_listas, N):
-    # Recorremos todas las listas en la lista de listas
-    for lista in lista_de_listas:
-        # Utilizamos una comprensión de lista para filtrar los números mayores o iguales a N
-        lista[:] = [x for x in lista if x >= N]
-
-        # Si la lista quedó vacía después de eliminar los elementos menores a N, agregamos un 0
-        if not lista:
-            lista.append(0)
-
-    return lista_de_listas
 
 ##########################################################################################################################
 ## Datos Computacionales
-#"data/DataNetwork/StreetAsNode/all_data_SimpleNet_new.csv"
-#"data/DataNetwork/StreetAsNode/all_data_ComplexNet_new.csv"
-datos_comp = pd.read_csv("data/DataNetwork/StreetAsNode/all_data_ComplexNet_new.csv")
+datos_comp = pd.read_csv(Datos_computacionales[1])
 
 ## Datos observacional
-#"data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv"
-#"data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_max.csv"
-#"data/DataImages/In_Streets_Coord/Normal/streetsCoordsR1S4.csv"
-#"data/DataImages/In_Streets_Coord/Normal/MaxStreetscoordsR0S6.csv"
-#"data/DataImages/In_Streets_Coord/Normal/MeanStreetscoordsR0S6.csv"
-datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv")
+datos_obs = pd.read_csv(Datos_observacionales[0])
 
 ## Columnas de datos Computacionales
 #"BC"

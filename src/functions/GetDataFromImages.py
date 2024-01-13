@@ -18,21 +18,6 @@ import os
 from PIL import Image
 
 
-def addTrafficColorToDataFrameFromHDF5(self, file_name_hdf5):
-        
-        with pd.HDFStore(file_name_hdf5, mode='r') as store:
-            # Obtener la lista de claves (nombres de las imágenes)
-            nombres = store.keys()
-            coordenadas = self.position_of_vertices.items()
-        
-            for nombre in nombres:
-                datos = store[nombre]
-                dict_to_add_to_dataFrame = {index: datos.iloc[round(coords[1]), round(coords[0])] for index, coords in self.position_of_vertices.items()}
-                nombre_sin_png = nombre.replace(".png", "")
-                self.addColumnToDataFrame(dict_to_add_to_dataFrame, nombre_sin_png)
-        
-        return self.NodesdataFrame
-
 
 class DataImages:
 
@@ -245,22 +230,11 @@ class DataImages:
 
 
 #Para obtener los datos en las coordenanas que le entregamos
-def obtenerTodoDeImagenes():
-    PuntaArenas = DataImages("data/Images/screenshots","data/DataMakeNetwork/PuntaArenasDetallado")
-    file_name_save = "data/DataImages/DataMatrixImages.h5"
-    
-def obtenerDataFrameDetalladoNodos():
-    PuntaArenasNodes = DataImages("data/Images/screenshots","data/DataMakeNetwork/PuntaArenasDetallado")
-    datos_de_imagenes = "data/DataImages/DataMatrixImages.h5"
-
-    dataFrame = PuntaArenasNodes.addTrafficColorToDataFrameFromHDF5(datos_de_imagenes)
-
-    dataFrame.to_csv("intersectionCoord_detallado.csv")    
 
 #Para obtener los datos en las coordenadas de los ejes que entregamos
 def obtenerDataFrameDetalladoEdges():
     
-    PuntaArenasEdges = DataImagesForEdges("data/Images/screenshots","data/DataMakeNetwork/PuntaArenasDetallado")
+    PuntaArenasEdges = DataImages("data/Images/screenshots","data/DataMakeNetwork/PuntaArenasDetallado")
     datos_de_imagenes = "data/DataImages/DataMatrixImages.h5"
 
     Datos_mean, Datos_max = PuntaArenasEdges.dataEdgesAllImagesToDataFrame(datos_de_imagenes, steps=1, Radio=0)

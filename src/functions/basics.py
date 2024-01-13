@@ -5,6 +5,8 @@ from PIL import Image
 import imageio
 import re
 from datetime import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def CrearCarpeta(nombre_carpeta):
     # Ruta completa donde deseas crear la carpeta
@@ -190,6 +192,55 @@ def crearNintervalosOrdenados(X, Y, N):
         intervalos_Y[indice_intervalo].append(y)
 
     return intervalos_X, intervalos_Y
+
+def apply_threshold(lista_de_listas, N):
+    # Recorremos todas las listas en la lista de listas
+    for lista in lista_de_listas:
+        # Utilizamos una comprensión de lista para filtrar los números mayores o iguales a N
+        lista[:] = [x for x in lista if x >= N]
+
+        # Si la lista quedó vacía después de eliminar los elementos menores a N, agregamos un 0
+        if not lista:
+            lista.append(0)
+
+    return lista_de_listas
+
+def plot_distribution(data, name):
+
+     # Crear una figura y ejes
+    fig, ax = plt.subplots()
+
+    # Ajustar el tamaño de las fuentes de los ejes X e Y
+    ax.tick_params(axis='x', labelsize=18)  # Tamaño de fuente para el eje X
+    ax.tick_params(axis='y', labelsize=18)  # Tamaño de fuente para el eje Y
+    
+    # Ajustar la cantidad de ticks en los ejes X e Y
+    #ax.set_xticks([0.007, 0.01, 0.013, 0.016])
+    #ax.set_yticks([0.1, 0.3, 0.5])
+
+    # Ajustar el tamaño de las fuentes en las etiquetas y títulos
+    
+    ax.set_xlabel(rf'${name}$', fontsize=18)
+    ax.set_ylabel(rf'$P[{name}]$', fontsize=18, rotation = 0)
+    
+    # Ajustar las coordenadas de las etiquetas de los ejes X e Y
+    ax.xaxis.set_label_coords(1.04, 0.04)  
+    ax.yaxis.set_label_coords(0, 1.01)
+
+    # Eliminar el contorno superior y derecho del gráfico
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # Graficar el histograma con las alturas de las barras ajustadas
+    sns.histplot(data, bins=20, kde=True, color='red', ax=ax, stat="probability")
+
+    # Agregar líneas de cuadrícula en el eje Y
+    #ax.yaxis.grid(True)
+    plt.tight_layout()
+    # Mostrar el gráfico
+    #plt.savefig(f"distribution {name}")
+    plt.show()
+
 
 def reescalar_lista_de_listas(lista_de_listas, maximo):
 
