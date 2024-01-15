@@ -1,8 +1,6 @@
 #Ignota lo que está en temp
 data/Images
 
-#Ignorar los datos de Thresholds
-Threshold*
 
 *.png
 
@@ -23,4 +21,4 @@ data/DataImages/DataMatrixImages.h5
 data/DataNetwork/StreetAsNode/ComplexNet_states_10mA_500BT_10mS_streets.csv
 
 #Progrmas de prueba
-functions/Funciones
+src/functions/Funciones
