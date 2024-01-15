@@ -1,11 +1,19 @@
+"""
+Grafica por cada instante de tiempo un Scatter entre:
+la intensidad de trafico promedio de cada nodo 
+vs 
+el indice topologico que tengamos de la red.
+
+Muestra la distrbucion de probabilidad de la intensidad
+Divide en boxplots y muestra en azul su mediana.
+"""
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 import seaborn as sns
-from functions import *
-import scienceplots
-import statistics as stat
+from functions import CrearCarpeta, obtener_nombres_con_H_M_sinFDS, reescalar_lista_de_listas, crearNintervalosOrdenados
+from functions.RutasDeArchivos import Datos_computacionales, Datos_observacionales
 
 
 def scatter_and_boxplot(X, Y, N):
@@ -58,10 +66,6 @@ def scatter_and_boxplot(X, Y, N):
 def scatter4MeanObsValues(compu_data, list_of_list_of_Obs, carpetaSup,title,  xlabel = "x"):
     ## Usamos el promedio de 
     promedios = [np.mean(data) for data in list_of_list_of_Obs]
-
-    # Obteniendo su skweness y kurtosis
-    kurtosis = scipy.stats.kurtosis(promedios)
-    skewness = scipy.stats.skew(promedios)
     
     ## GRAFICANDO 
     ### Agregando Cajas
@@ -87,32 +91,13 @@ def scatter4MeanObsValues(compu_data, list_of_list_of_Obs, carpetaSup,title,  xl
 
 ##########################################################################################################################
 ## Datos Computacionales
-
-#"data/DataNetwork/StreetAsNode/all_data_SimpleNet_new.csv"
-#"data/DataNetwork/StreetAsNode/all_data_ComplexNet_new.csv"
-datos_comp = pd.read_csv("data/DataNetwork/StreetAsNode/all_data_ComplexNet_new.csv")
+datos_comp = pd.read_csv(Datos_computacionales[1])
 
 ## Datos observacional
+datos_obs = pd.read_csv(Datos_observacionales[0])
 
-#"data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv"
-#"data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_max.csv"
-#"data/DataImages/In_Streets_Coord/Normal/streetsCoordsR1S4.csv"
-#"data/DataImages/In_Streets_Coord/Normal/MaxStreetscoordsR0S6.csv"
-#"data/DataImages/In_Streets_Coord/Normal/MeanStreetscoordsR0S6.csv"
-datos_obs = pd.read_csv("data/DataImages/In_Streets_Coord/Detallado/DataStreetDetR1S1_mean.csv")
 
 ## Columnas de data_observacional Computacionales
-#"BC"
-#"CC"
-#"DC"
-#"DiBC"
-#"DiCC"
-#"DiDC"
-#"MaxOcupation"
-#"mean_state_RW"
-#"mean_state_RW_lim"
-#"mean_state_RWM"
-#"mean_state_RWM_lim"
 nombres = ["BC",
             "CC",
             "DC",
