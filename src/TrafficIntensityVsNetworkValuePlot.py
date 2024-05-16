@@ -6,7 +6,11 @@ el indice topologico que tengamos de la red.
 
 Muestra la distrbucion de probabilidad de la intensidad
 Divide en boxplots y muestra en azul su mediana.
+
+
 """
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,6 +18,7 @@ import scipy
 import seaborn as sns
 from functions import CrearCarpeta, obtener_nombres_con_H_M_sinFDS, reescalar_lista_de_listas, crearNintervalosOrdenados
 from functions.RutasDeArchivos import Datos_computacionales, Datos_observacionales
+import scienceplots
 
 
 def scatter_and_boxplot(X, Y, N):
@@ -29,13 +34,15 @@ def scatter_and_boxplot(X, Y, N):
     # Gráfico de diagrama de caja en el primer subplot
     Medianas = []
     Posiciones_X = []
+    ancho = 1/N
     for i in range(N):
         if intervalos_X[i]:
-            ancho = (intervalos_X[i][-1] - intervalos_X[i][0])
-            positions = [intervalos_X[i][-1] - (ancho / 2)]
-            ax1.boxplot(intervalos_Y[i], positions=positions, widths=ancho, showfliers=False, patch_artist=True, boxprops={'facecolor': 'gray', 'alpha': 0.4}, medianprops={'color': 'blue', 'linewidth': 3})
+            #ancho = (intervalos_X[i][-1] - intervalos_X[i][0]) ANCHO VARIABLE
+            pos_x_to_plot = [ancho*(i + 1/2)]
+            pos_x_to_save = [np.mean(intervalos_X[i])]
+            ax1.boxplot(intervalos_Y[i], positions=pos_x_to_plot, widths=ancho, showfliers=False, patch_artist=True, boxprops={'facecolor': 'gray', 'alpha': 0.4}, medianprops={'color': 'black', 'linewidth': 3})
             # Guardando datos[punto medio de x boxes, mean de Y, median de Y]
-            Posiciones_X.append(positions[0])
+            Posiciones_X.append(pos_x_to_plot[0])
   
     Medianas = [np.median(subconjunto) for subconjunto in intervalos_Y]
 
@@ -61,7 +68,7 @@ def scatter_and_boxplot(X, Y, N):
     ax2.set_ylim(0,1)
     ax2.set_xlim(0,12)
     ax2.set_xticks([])
-    return Medianas, Posiciones_X
+    return Medianas, Posiciones_X, ax1, ax2
 
 def scatter4MeanObsValues(compu_data, list_of_list_of_Obs, carpetaSup,title,  xlabel = "x"):
     ## Usamos el promedio de 
@@ -69,50 +76,43 @@ def scatter4MeanObsValues(compu_data, list_of_list_of_Obs, carpetaSup,title,  xl
     
     ## GRAFICANDO 
     ### Agregando Cajas
-    medians_box, pos_box = scatter_and_boxplot(list(compu_data), list(promedios), 20)
+    medians_box, pos_box, ax1, ax2 = scatter_and_boxplot(list(compu_data), list(promedios), 3)
     
+
     ## REGRESION LINEAL
     #(slope, intercept, r_value, p_value, std_err)
     medians_params = scipy.stats.linregress(pos_box, medians_box)    
 
-    ## Guardando los graficos
-    NombreCarpeta = carpetaSup+"/"+str(xlabel) + "mean"
-    CrearCarpeta(NombreCarpeta)
+    x = np.linspace(-10, 10, 100)
+    y = medians_params[0] * x + medians_params[1]
 
+    ax1.plot(x, y, '-r', label='y = {}x + {}'.format(medians_params[0], medians_params[1]))
+
+    ## Guardando los graficos
     plt.tight_layout()
     # Ajustar la distancia entre los subgráficos
     plt.subplots_adjust(wspace=0)
-
-    plt.savefig(NombreCarpeta+"/Boxscatter_"+str(xlabel)+"_"+str(title)+".png")
+    
+    plt.savefig(carpetaSup+"/Boxscatter_"+str(xlabel)+"_"+str(title)+".png")
     #plt.show()
-
 
     return medians_params
 
+## Parametros
+nombres = ['DC']
+
 ##########################################################################################################################
+#Conjunto de archivos
+N505 = [Datos_computacionales[0], Datos_observacionales[2]]
+N1207 = [Datos_computacionales[1], Datos_observacionales[0]]
+
 ## Datos Computacionales
-datos_comp = pd.read_csv(Datos_computacionales[1])
-
+datos_comp = pd.read_csv(N1207[0])
+print(len(datos_comp))
 ## Datos observacional
-datos_obs = pd.read_csv(Datos_observacionales[0])
+datos_obs = pd.read_csv(N1207[1])
+print(len(datos_obs))
 
-
-## Columnas de data_observacional Computacionales
-nombres = ["BC",
-            "CC",
-            "DC",
-            "DiBC",
-            "DiCC",
-            "DiDC",
-            "MaxOcupation",
-            "mean_state_RW",
-            "mean_state_RW_lim",
-            "mean_state_RWM",
-            "mean_state_RWM_lim"]
-
-###########################################
-nombres = ["DiCC"]
-############################################
 
 for name_column in nombres:
     
