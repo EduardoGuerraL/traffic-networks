@@ -1,213 +1,156 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import scipy
 import scienceplots
-import seaborn as sns
 from sklearn.linear_model import LinearRegression
-from statistics import mode
 from sklearn.metrics import r2_score
 from scipy import stats
-from scipy.stats import scoreatpercentile
-from functions.basics import CrearCarpeta, reescalar_lista_de_listas, crearNintervalosOrdenados, obtener_nombres_con_H_M_sinFDS
+from functions.basics import reescalar_lista_de_listas, crearNintervalosOrdenados, obtener_nombres_con_H_M_sinFDS
 from functions.RutasDeArchivos import Datos_computacionales, Datos_observacionales
+import math
 
-def scatter_and_boxplot(X, Y, N):
-    ## GRAFICANDO SCATTER CON BOXPLOT
-
-    # Dividir X e Y en N intervalos
-    intervalos_X, intervalos_Y = crearNintervalosOrdenados(X, Y, N)
-
+def calculate_median_positions(X: list, Y: list, box_count: int):
+    # Dividir X e Y en box_count intervalos
+    intervalos_X, intervalos_Y = crearNintervalosOrdenados(X, Y, box_count)
+    
     # Gráfico de diagrama de caja en el primer subplot
-    Medianas = []
-    Promedios = []
-    Posiciones_X = []
-    for i in range(N):
+    y_median_box = []
+    x_median_box = []
+    for i in range(box_count):
         if intervalos_X[i]:
             ancho = (intervalos_X[i][-1] - intervalos_X[i][0])
             positions = [intervalos_X[i][-1] - (ancho / 2)]
-            
-            promedio = np.mean(intervalos_Y[i])
-            
+                    
             # Guardando datos[punto medio de x boxes, mean de Y, median de Y]
-            Posiciones_X.append(positions[0])
-            Promedios.append(promedio)
+            x_median_box.append(positions[0])
     
-    Medianas = [np.median(subconjunto) for subconjunto in intervalos_Y]
-    return Medianas, Promedios, Posiciones_X
+    y_median_box = [np.median(subconjunto) for subconjunto in intervalos_Y]
+    return y_median_box, x_median_box
 
-def scatter4MeanObsValues(compu_data, list_of_list_of_Obs, xlabel = "x"):
+def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp, n_boxes):
+    Slopes = []
+    Per95 = []
 
-    # Calcular la media y desviación estándar de cada lista en list_of_list_of_Obs
+    hora_inicial, hora_final = 0, 24
+    for hora_in in range(hora_inicial, hora_final):
+        for minuto_in in range(0, 60, 15):
 
-    promedios = [np.mean(data) for data in list_of_list_of_Obs]
+            columnas_elejidas = obtener_nombres_con_H_M_sinFDS(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
+            data_observacional = datos_obs[columnas_elejidas].values.tolist()
+            
+            ## Reescalando los data_observacional de 0 a 1
+            data_observacional = reescalar_lista_de_listas(data_observacional, 255)  
+         
 
-    # Obteniendo su skweness y kurtosis
-    kurtosis = scipy.stats.kurtosis(promedios)
-    skewness = scipy.stats.skew(promedios)
+            # Obtener el promedio de cada nodo sobre los dias en el instante de tiempo
+            promedios = [np.mean(data) for data in data_observacional]
+            # Percentil 90
+            percentil_95 = np.percentile(promedios, 95)
+            y_medians, x_medians = calculate_median_positions(datos_comp, promedios, n_boxes)
+            ## REGRESION LINEAL
+            #(slope, intercept, r_value, p_value, std_err)
+            medians_params = scipy.stats.linregress(x_medians, y_medians)
+            Slopes.append(medians_params[0])
+            Per95.append(percentil_95)
     
-    #viendo distribucion
-    # Mediana
-    mediana = np.median(promedios)
+    return Slopes, Per95
 
-    # Percentil 90
-    percentil_90 = np.percentile(promedios, 95)
-
-    # Máximo
-    maximo = np.max(promedios)
-
-    # Tercer cuartil (percentil 75)
-    cuartil_3 = np.percentile(promedios, 5)
-
-    prom = np.mean(promedios)
-
-    moda = mode(promedios)
-
-    # Ordenar los datos
-    datos_ordenados = np.sort(promedios)
-
-    # Calcular los percentiles necesarios
-    Q1 = scoreatpercentile(datos_ordenados, 25)
-    Q3 = scoreatpercentile(datos_ordenados, 75)
-    D1 = scoreatpercentile(datos_ordenados, 10)
-    D9 = scoreatpercentile(datos_ordenados, 90)
-
-    # Calcular el rango intercuartílico (IQR)
-    IQR = Q3 - Q1
-
-    # Calcular el coeficiente de asimetría de Bowley-Yule
-    coef_bowley_yule = ((D9 - D1) * 12) / (IQR * 10)
-
-    ## GRAFICANDO 
-    ### Agregando Cajas
-    medians_box, means_box, pos_box = scatter_and_boxplot(list(compu_data), list(promedios), 20)
+def find_values_matrix(data):
+    X = list(data[0])
+    Y = list(data[1])
+    Z = list(data[2])
     
-    ## REGRESION LINEAL
-    #(slope, intercept, r_value, p_value, std_err)
-    medians_params = scipy.stats.linregress(pos_box, medians_box)
-    means_params = scipy.stats.linregress(pos_box, means_box)
-    
-    return medians_params, means_params, kurtosis, skewness, mediana, percentil_90, maximo, cuartil_3, prom, moda, coef_bowley_yule
+    # Encontrar el valor máximo de X y su correspondiente Y
+    X_max = max(X)
+    indice_X_max = X.index(X_max)
+    Y_X_max = Y[indice_X_max]
+    Z_X_max = Z[indice_X_max]
+
+    # Encontrar el valor máximo de Y y su correspondiente X
+    Y_max = max(Y)
+    indice_Y_max = Y.index(Y_max)
+    X_Y_max = X[indice_Y_max]
+    Z_Y_max = Z[indice_Y_max]
+
+    return X_Y_max,Y_max, Z_Y_max
 
 ##########################################################################################################################
-## Datos Computacionales
-datos_comp1 = pd.read_csv(Datos_computacionales[0])
-datos_comp2 = pd.read_csv(Datos_computacionales[1])
+#Conjunto de archivos
+N505 = [Datos_computacionales[1], Datos_observacionales[0]]
+N1207 = [Datos_computacionales[0], Datos_observacionales[2]]
+datos_comp_N505 = pd.read_csv(N505[0])
+datos_obs_N505 = pd.read_csv(N505[1])
+datos_comp_N1207 = pd.read_csv(N1207[0])
+datos_obs_N1207 = pd.read_csv(N1207[1])
+data_observacional = [datos_obs_N505,datos_obs_N1207]
+data_computacional  = [datos_comp_N505, datos_comp_N1207]
 
-## Datos observacional
-datos_obs1 = pd.read_csv(Datos_observacionales[2])
-datos_obs2 = pd.read_csv(Datos_observacionales[0])
+############################################
+#model          Topology data,         datos de Google,       Topology Index  max R-Square  Treshold
+ModelGN505 =   [data_computacional[0], data_observacional[0] ,'CC'           ,0.82          ,0.33]
+ModelGN1207 =  [data_computacional[1], data_observacional[1] ,'CC'           ,0.87          ,0.33]
+ModelDGN505 =  [data_computacional[0], data_observacional[0] ,'DiCC'         ,0.87          ,0.37]
+ModelDGN1207 = [data_computacional[1], data_observacional[1] ,'DiCC'         ,0.92          ,0.33]
 
-## Columnas de data_observacional Computacionales
-nombres = ["BC",
-            "CC",
-            "DC",
-            "DiBC",
-            "DiCC",
-            "DiDC",
-            "MaxOcupation",
-            "mean_state_RW",
-            "mean_state_RW_lim",
-            "mean_state_RWM",
-            "mean_state_RWM_lim"
-        ]
 
-# Definir los umbrales
-umbrales = np.linspace(0, 0.55, 1000)  # Cambia el número 50 para tener más o menos umbrales
+#All Models
+Modelos = [ModelGN505, ModelGN1207, ModelDGN505, ModelDGN1207]
+model_number = 2
+
+data_computational = Modelos[model_number][0][Modelos[model_number][2]]
+data_observational = Modelos[model_number][1]
+threshold = Modelos[model_number][4]
 
 # Definir los nombres de las columnas
-nombres = ["CC", "DiCC"]
-
-# Listas de datos adicionales
-datos_adicionales = [
-    (datos_comp1, datos_obs1),
-    (datos_comp2, datos_obs2)
-]
+nombres = ["DiBC","BC","DiCC", "CC", "DiDC", "DC"]
 
 # Diccionarios para almacenar los datos de cada nombre
-R2 = []
-for datos_comp, datos_obs in datos_adicionales:
-    datos_por_nombre = {nombre: {"Slopes": [], "SuperAlgo": []} for nombre in nombres}
+lista_datos_por_nombre = []
+for datos_obs, datos_comp in zip(data_observacional, data_computacional):
     # Bucle para recorrer cada nombre
+    
+    #Donde guardaremos todos los datos de la forma: [[slopes],[r2],[alpha]]
     for name_column in nombres:
-        Slopes = []
-        SuperAlgo = []
-        
+                
         data_computational = datos_comp[name_column]
         data_computational = [(i-min(data_computational))/(max(data_computational)-min(data_computational)) for i in data_computational]
         
-        hora_inicial, hora_final = 0, 24
-        for hora_in in range(hora_inicial, hora_final):
-            for minuto_in in range(0, 60, 15):
+        if name_column in ["DiDC", "DC"]:
+            n = 3
+        if name_column in ["DiBC", "BC"]:
+            n = 15
+        if name_column in ["DiCC", "CC"]:
+            n = 20
+    
+        Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= datos_obs, datos_comp= data_computational, n_boxes= n)
 
-                columnas_elejidas = obtener_nombres_con_H_M_sinFDS(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
-                data_observacional = datos_obs[columnas_elejidas].values.tolist()
-                
-                ## Reescalando los data_observacional de 0 a 1
-                data_observacional = reescalar_lista_de_listas(data_observacional, 255)                
-                
-                fit_params_medians,fit_params_means, kurtosis, skewness, mediana, percentil_90, maximo, cuartil_3, prom, moda, coef  = scatter4MeanObsValues(data_computational, data_observacional, xlabel = name_column)
-                
-                Slopes.append(fit_params_medians[0])
-                algo  = percentil_90
-                SuperAlgo.append(algo)
-
+        # Definir los umbrales
+        umbrales = np.linspace(min(Per95), max(Per95)- 0.2*max(Per95), 200)  # Cambia el número 50 para tener más o menos umbrales
+        #Donde guardaremos los datos
+        Todos_los_datos = []
+        r2_list = []
+        slopes_list = []
+        Trh = []
         for threshold in umbrales:
+            threshold = math.trunc(threshold * 100) / 100
+
             # Dividir los puntos por encima y por debajo del threshold
-            datos_filtrados = [(x, y) for x, y in zip(Slopes, SuperAlgo) if y > threshold]
+            datos_filtrados = [(x, y) for x, y in zip(Slopes, Per95) if y >= threshold]
             X_filtrado, Y_filtrado = zip(*datos_filtrados)
-
-            # Convertir a arrays de numpy para usarlos en la regresión lineal
-            X_filtrado = np.array(X_filtrado).reshape(-1, 1)
-            Y_filtrado = np.array(Y_filtrado)
-
-            # Guardar los datos filtrados en la lista correspondiente al nombre actual
-            datos_por_nombre[name_column]["Slopes"].append(X_filtrado)
-            datos_por_nombre[name_column]["SuperAlgo"].append(Y_filtrado)
-    R2.append(datos_por_nombre)
-
-# Crear el gráfico combinado para ambos nombres
-plt.figure(figsize=(8, 6))
-plt.style.use(["science", "notebook", "grid"])
-
-
-# Lista para almacenar los valores de R^2
-r2_valores = []
-slope_slopes = []
-for i in range(2):
-    datos_por_nombre = R2[i]
-    for nombre, datos in datos_por_nombre.items():
-        r2_valores_nombre = []
-        slopes =[]
-        for i in range(len(umbrales)):
-            # Realizar la regresión lineal con los datos filtrados
-            modelo = LinearRegression().fit(
-                np.array(datos["Slopes"][i]).reshape(-1, 1),
-                np.array(datos["SuperAlgo"][i])
-            )
-            # Calcular el coeficiente de determinación (R^2)
-            y_pred = modelo.predict(np.array(datos["Slopes"][i]).reshape(-1, 1))
-            r2 = r2_score(np.array(datos["SuperAlgo"][i]), y_pred)
-            r2_valores_nombre.append(r2)
-
-            #obtener pendiente
-            pendiente = modelo.coef_[0]
-            slopes.append(pendiente)
-
-        # Guardar los valores de R^2 para cada nombre
-        r2_valores.append(r2_valores_nombre)
-        slope_slopes.append(slopes)
-
         
+            
+            ## REGRESION LINEAL
+            #(slope, intercept, r_value, p_value, std_err)
+            medians_params = scipy.stats.linregress(X_filtrado, Y_filtrado)
+            
+            r2_list.append(math.trunc((medians_params[2]**2) * 100) / 100)
+            slopes_list.append(math.trunc((medians_params[0]) * 100) / 100)
+            Trh.append(threshold)
 
-# Graficar los valores de R^2 en función de los umbrales para cada nombre
-nombres = ["CC 505","DiCC 505", "CC 1207", "DiCC 1207"]
-for i in range(4):
-    plt.plot(slope_slopes[i], r2_valores[i], marker='o', label = nombres[i])
+        Todos_los_datos.append(slopes_list)
+        Todos_los_datos.append(r2_list)
+        Todos_los_datos.append(Trh)
 
-plt.xlabel('slope', fontsize = 30)
-plt.ylabel('$R2$', fontsize = 30)
-plt.legend()
-plt.grid(True)
-plt.show()
+        print(name_column, find_values_matrix(Todos_los_datos))
+    
