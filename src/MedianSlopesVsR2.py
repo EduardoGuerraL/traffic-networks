@@ -77,8 +77,8 @@ def find_values_matrix(data):
 
 ##########################################################################################################################
 #Conjunto de archivos
-N505 = [Datos_computacionales[1], Datos_observacionales[0]]
-N1207 = [Datos_computacionales[0], Datos_observacionales[2]]
+N1207 = [Datos_computacionales[1], Datos_observacionales[0]]
+N505 = [Datos_computacionales[0], Datos_observacionales[2]]
 datos_comp_N505 = pd.read_csv(N505[0])
 datos_obs_N505 = pd.read_csv(N505[1])
 datos_comp_N1207 = pd.read_csv(N1207[0])
@@ -104,7 +104,7 @@ threshold = Modelos[model_number][4]
 
 # Definir los nombres de las columnas
 nombres = ["DiBC","BC","DiCC", "CC", "DiDC", "DC"]
-
+nombres = ['CC', 'DiCC']
 # Diccionarios para almacenar los datos de cada nombre
 lista_datos_por_nombre = []
 for datos_obs, datos_comp in zip(data_observacional, data_computacional):
@@ -122,7 +122,7 @@ for datos_obs, datos_comp in zip(data_observacional, data_computacional):
             n = 15
         if name_column in ["DiCC", "CC"]:
             n = 20
-    
+
         Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= datos_obs, datos_comp= data_computational, n_boxes= n)
 
         # Definir los umbrales
@@ -133,7 +133,7 @@ for datos_obs, datos_comp in zip(data_observacional, data_computacional):
         slopes_list = []
         Trh = []
         for threshold in umbrales:
-            threshold = math.trunc(threshold * 100) / 100
+            threshold = math.trunc(threshold * 1000) / 1000
 
             # Dividir los puntos por encima y por debajo del threshold
             datos_filtrados = [(x, y) for x, y in zip(Slopes, Per95) if y >= threshold]
@@ -144,13 +144,14 @@ for datos_obs, datos_comp in zip(data_observacional, data_computacional):
             #(slope, intercept, r_value, p_value, std_err)
             medians_params = scipy.stats.linregress(X_filtrado, Y_filtrado)
             
-            r2_list.append(math.trunc((medians_params[2]**2) * 100) / 100)
-            slopes_list.append(math.trunc((medians_params[0]) * 100) / 100)
+            r2_list.append(math.trunc((medians_params[2]**2) * 1000) / 1000)
+            slopes_list.append(math.trunc((medians_params[0]) * 1000) / 1000)
             Trh.append(threshold)
 
         Todos_los_datos.append(slopes_list)
         Todos_los_datos.append(r2_list)
         Todos_los_datos.append(Trh)
-
         print(name_column, find_values_matrix(Todos_los_datos))
     
+    #for i in range(len(Todos_los_datos[0])-1):
+     #   print(Todos_los_datos[0][i],Todos_los_datos[1][i],Todos_los_datos[2][i])

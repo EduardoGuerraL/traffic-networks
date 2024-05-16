@@ -61,8 +61,8 @@ def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp):
 
 ##########################################################################################################################
 #Conjunto de archivos
-N505 = [Datos_computacionales[1], Datos_observacionales[0]]
-N1207 = [Datos_computacionales[0], Datos_observacionales[2]]
+N505 = [Datos_computacionales[0], Datos_observacionales[2]]
+N1207 = [Datos_computacionales[1], Datos_observacionales[0]]
 datos_comp_N505 = pd.read_csv(N505[0])
 datos_obs_N505 = pd.read_csv(N505[1])
 datos_comp_N1207 = pd.read_csv(N1207[0])
@@ -70,8 +70,8 @@ datos_obs_N1207 = pd.read_csv(N1207[1])
 data_observacional = [datos_obs_N505,datos_obs_N1207]
 data_computacional  = [datos_comp_N505, datos_comp_N1207]
 
-datos_comp = data_computacional[1]
-datos_obs = data_observacional[1]
+datos_comp = data_computacional[0]
+datos_obs = data_observacional[0]
 
 ## Columnas de data_observacional Computacionales
 nombres = ["BC",
@@ -164,69 +164,3 @@ std_dev = np.std(residuals)
 # Añadir texto con R^2 y desviación estándar al gráfico
 '''
 plt.show()
-
-"""
-opcion 2
-"""
-
-'''
-# threshold M
-threshold = 0.35
-plt.tick_params(axis='both', labelsize=18)  # Tamaño de fuente para los números de los ejes
-
-# Dividir los puntos por encima y por debajo del threshold
-datos_filtrados = [(x, y) for x, y in zip(Slopes, Per95) if y > threshold]
-X_filtrado, Y_filtrado = zip(*datos_filtrados)
-
-# Convertir a arrays de numpy para usarlos en la regresión lineal
-X_filtrado = np.array(X_filtrado).reshape(-1, 1)
-Y_filtrado = np.array(Y_filtrado)
-
-# Realizar la regresión lineal con los datos filtrados
-modelo = LinearRegression().fit(X_filtrado, Y_filtrado)
-
-# Obtener la pendiente y la intersección
-pendiente = modelo.coef_[0]
-interseccion = modelo.intercept_
-
-# Dibujar el fondo dividido por el threshold
-plt.axhspan(-1, threshold, facecolor='skyblue', alpha=0.6)  # Área por debajo del threshold
-plt.axhspan(threshold, 2, facecolor='firebrick', alpha=0.8)   # Área por encima del threshold
-# Crear el plot con colores diferentes para por encima y por debajo del threshold
-plt.scatter(Slopes, Per95, edgecolors='black', facecolors='white', label='Datos filtrados')
-
-X_plot = np.linspace(min(X_filtrado), max(X_filtrado), 100)
-plt.plot(X_plot, modelo.predict(X_plot), color='k', label='Regresión lineal', linestyle = "--")
-#plt.axhline(threshold, linestyle='--', color='gray')
-
-# Límites de los ejes X e Y con un pequeño margen alrededor de los datos
-x_min, x_max = min(Slopes), max(Slopes)
-y_min, y_max = min(Per95), max(Per95)
-
-x_range = x_max - x_min
-y_range = y_max - y_min
-
-# Agregar un pequeño margen alrededor de los datos
-plt.xlim(x_min - 0.1 * x_range, x_max + 0.1 * x_range)
-plt.ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
-
-# Calcular el coeficiente de determinación (R^2)
-y_pred = modelo.predict(X_filtrado)
-r2 = r2_score(Y_filtrado, y_pred)
-
-# Calcular la desviación estándar
-residuals = Y_filtrado - y_pred
-std_dev = np.std(residuals)
-
-# Resto del código de trazado...
-# Añadir texto con R^2 y desviación estándar al gráfico
-plt.text(0.2, 0.9, f'$R^2$= {r2:.3f}\n$\sigma$= {std_dev:.2e}', 
-    horizontalalignment='center', verticalalignment='center', 
-    transform=plt.gca().transAxes, fontsize=16)
-
-plt.text(0.8, threshold, r'$\alpha$= {:.3f}'.format(threshold), 
-    horizontalalignment='center', verticalalignment='center', 
-    transform=plt.gca().transAxes, fontsize=16)
-
-plt.show()
-'''

@@ -48,7 +48,7 @@ def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp):
             promedios = [np.mean(data) for data in data_observacional]
             # Percentil 90
             percentil_95 = np.percentile(promedios, 95)
-            y_medians, x_medians = calculate_median_positions(datos_comp, promedios, 3)
+            y_medians, x_medians = calculate_median_positions(datos_comp, promedios, 20)
             ## REGRESION LINEAL
             #(slope, intercept, r_value, p_value, std_err)
             medians_params = scipy.stats.linregress(x_medians, y_medians)
@@ -61,8 +61,8 @@ def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp):
 
 ##########################################################################################################################
 #Conjunto de archivos
-N505 = [Datos_computacionales[1], Datos_observacionales[0]]
-N1207 = [Datos_computacionales[0], Datos_observacionales[2]]
+N505 = [Datos_computacionales[0], Datos_observacionales[2]]
+N1207 = [Datos_computacionales[1], Datos_observacionales[0]]
 datos_comp_N505 = pd.read_csv(N505[0])
 datos_obs_N505 = pd.read_csv(N505[1])
 datos_comp_N1207 = pd.read_csv(N1207[0])
@@ -70,16 +70,16 @@ datos_obs_N1207 = pd.read_csv(N1207[1])
 data_observacional = [datos_obs_N505,datos_obs_N1207]
 data_computacional  = [datos_comp_N505, datos_comp_N1207]
 ############################################
-#model          Topology data,         datos de Google,       Topology Index  max R-Square  Treshold
-ModelGN505 =   [data_computacional[0], data_observacional[0] ,'CC'           ,0.82          ,0.33]
-ModelGN1207 =  [data_computacional[1], data_observacional[1] ,'CC'           ,0.87          ,0.33]
-ModelDGN505 =  [data_computacional[0], data_observacional[0] ,'DiCC'         ,0.87          ,0.3666383533571134]
-ModelDGN1207 = [data_computacional[1], data_observacional[1] ,'DiCC'         ,0.92          ,0.33]
+#model          Topology data,         datos de Google,       Topology Index  max R-Square    Treshold
+ModelGN1207 =  [data_computacional[1], data_observacional[1] ,'CC'           ,0.815          ,0.328]
+ModelDGN1207 = [data_computacional[1], data_observacional[1] ,'DiCC'         ,0.870          ,0.368]
+ModelGN505 =   [data_computacional[0], data_observacional[0] ,'CC'           ,0.874          ,0.332]
+ModelDGN505 =  [data_computacional[0], data_observacional[0] ,'DiCC'         ,0.919          ,0.329]
 
 
 #All Models
 Modelos = [ModelGN505, ModelGN1207, ModelDGN505, ModelDGN1207]
-model_number = 2
+model_number = 3
 
 data_computational = Modelos[model_number][0][Modelos[model_number][2]]
 data_observational = Modelos[model_number][1]
@@ -87,6 +87,7 @@ threshold = Modelos[model_number][4]
 
 data_computational = [(i-min(data_computational))/(max(data_computational)-min(data_computational)) for i in data_computational]
 Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= data_observational, datos_comp= data_computational)
+
 ## Graficando
 """
 Opcion 1
@@ -98,6 +99,7 @@ plt.tick_params(axis='both', labelsize=18)  # Tamaño de fuente para los número
 # Dividir los puntos por encima y por debajo del threshold
 datos_filtrados = [(x, y) for x, y in zip(Slopes, Per95) if y > threshold]
 X_filtrado, Y_filtrado = zip(*datos_filtrados)
+medians_params = scipy.stats.linregress(X_filtrado, Y_filtrado)
 
 # Convertir a arrays de numpy para usarlos en la regresión lineal
 X_filtrado = np.array(X_filtrado).reshape(-1, 1)
@@ -109,6 +111,14 @@ modelo = LinearRegression().fit(X_filtrado, Y_filtrado)
 # Obtener la pendiente y la intersección
 pendiente = modelo.coef_[0]
 interseccion = modelo.intercept_
+
+# Calcular el coeficiente de determinación (R^2)
+y_pred = modelo.predict(X_filtrado)
+r2 = r2_score(Y_filtrado, y_pred)
+print(pendiente, medians_params[0])
+print(interseccion, medians_params[1])
+print(r2, medians_params[2]**2)
+
 
 """
 # Dibujar el fondo dividido por el threshold
@@ -136,10 +146,6 @@ y_range = y_max - y_min
 plt.xlim(-0.2, 0.31)
 plt.ylim(0.2, 0.7)
 #plt.legend()
-
-# Calcular el coeficiente de determinación (R^2)
-y_pred = modelo.predict(X_filtrado)
-r2 = r2_score(Y_filtrado, y_pred)
 
 # Calcular la desviación estándar
 residuals = Y_filtrado - y_pred
