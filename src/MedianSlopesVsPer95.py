@@ -79,7 +79,7 @@ ModelDGN505 =  [data_computacional[0], data_observacional[0] ,'DiCC'         ,0.
 
 #All Models
 Modelos = [ModelGN505, ModelGN1207, ModelDGN505, ModelDGN1207]
-model_number = 3
+model_number = 2
 
 data_computational = Modelos[model_number][0][Modelos[model_number][2]]
 data_observational = Modelos[model_number][1]
@@ -87,7 +87,6 @@ threshold = Modelos[model_number][4]
 
 data_computational = [(i-min(data_computational))/(max(data_computational)-min(data_computational)) for i in data_computational]
 Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= data_observational, datos_comp= data_computational)
-
 ## Graficando
 """
 Opcion 1
@@ -115,9 +114,6 @@ interseccion = modelo.intercept_
 # Calcular el coeficiente de determinación (R^2)
 y_pred = modelo.predict(X_filtrado)
 r2 = r2_score(Y_filtrado, y_pred)
-print(pendiente, medians_params[0])
-print(interseccion, medians_params[1])
-print(r2, medians_params[2]**2)
 
 
 """
@@ -143,7 +139,7 @@ y_range = y_max - y_min
 #plt.xlim(x_min - 0.1 * x_range, x_max + 0.1 * x_range)
 #plt.ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
 #plt.ylim(threshold - 0.1 * y_range , y_max + 0.1 * y_range)
-plt.xlim(-0.2, 0.31)
+plt.xlim(0, 0.32)
 plt.ylim(0.2, 0.7)
 #plt.legend()
 
@@ -153,12 +149,17 @@ std_dev = np.std(residuals)
 
 # Resto del código de trazado...
 # Añadir texto con R^2 y desviación estándar al gráfico
-plt.text(0.2, 0.9, f'$R^2$= {r2:.3f}\n$\sigma$= {std_dev:.2e}', 
+plt.text(0.2, 0.9, f'$R^2$= {r2:.3f}', 
     horizontalalignment='center', verticalalignment='center', 
     transform=plt.gca().transAxes, fontsize=16)
 
-plt.text(0.8, 0.2, r'$\alpha$= {:.3f}'.format(threshold), 
+posicion_alpha = (0.2 + (0.7-0.2)*threshold)
+
+plt.text(0.8, posicion_alpha, r'$\alpha$= {:.3f}'.format(threshold), 
     horizontalalignment='center', verticalalignment='center', 
     transform=plt.gca().transAxes, fontsize=16)
 
+plt.title(f'numero {model_number}')
+plt.xlabel('Slope Linear Fit')
+plt.ylabel('P95(traffic intensity)')
 plt.show()

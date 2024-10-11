@@ -8,12 +8,13 @@ import random
 class NetworkData:
     def __init__(self, path_dir_network_data: str):
         """
-        Crear el conjunto de datos de la red.
+        To extract information obout the network that you make in NetworkCreator.
 
         Args:
-            path_dir_network_data (str): Donde se encuentran los datos de posicion y coneccion de la red.
+            path_dir_network_data (str): Path where you save nodes, conections and lanes of network.
         """
 
+        
         self.img_without_traffic = plt.imread("data/Images/screenshots/CleanScreenshot.png") #Imagen Google
 
         # Se le entregan los datos que construimos en NetworkCreator.py

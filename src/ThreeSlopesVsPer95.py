@@ -30,7 +30,7 @@ def calculate_median_positions(X: list, Y: list, box_count: int):
     y_median_box = [np.median(subconjunto) for subconjunto in intervalos_Y]
     return y_median_box, x_median_box
 
-def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp):
+def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp, box_count):
     Slopes = []
     Per95 = []
 
@@ -48,7 +48,8 @@ def calculate_slopes_for_fit_medians_and_Per95(datos_obs, datos_comp):
             promedios = [np.mean(data) for data in data_observacional]
             # Percentil 90
             percentil_95 = np.percentile(promedios, 95)
-            y_medians, x_medians = calculate_median_positions(datos_comp, promedios, 3)
+            #percentil_95 = max(promedios)
+            y_medians, x_medians = calculate_median_positions(datos_comp, promedios, box_count)
             ## REGRESION LINEAL
             #(slope, intercept, r_value, p_value, std_err)
             medians_params = scipy.stats.linregress(x_medians, y_medians)
@@ -70,8 +71,8 @@ datos_obs_N1207 = pd.read_csv(N1207[1])
 data_observacional = [datos_obs_N505,datos_obs_N1207]
 data_computacional  = [datos_comp_N505, datos_comp_N1207]
 
-datos_comp = data_computacional[0]
-datos_obs = data_observacional[0]
+datos_comp = data_computacional[1]
+datos_obs = data_observacional[1]
 
 ## Columnas de data_observacional Computacionales
 nombres = ["BC",
@@ -100,17 +101,24 @@ plt.rcParams.update({
     "text.usetex": True,
 })
 plt.style.use(["science", "notebook", "grid"])
-colors = ['','','','red','blue','green']
-threshold = [0.25,0.33,0.32]
+#threshold = [0.25,0.329,0.319] #DGN505
+#threshold = [0.423,0.368,0.305] #DGN1207
+#threshold = [0.25,0.332,0.319] #GN505
+threshold = [0.38,0.328,0.305] #GN1027
+
+
 markers = ['o','s','^' ]
+box_count = [15,20,3]
+colores = ['green', 'blue', 'red']
 plt.tick_params(axis='both', labelsize=18)  # Tamaño de fuente para los números de los ejes
-plt.xlim(-0.2, 0.31)
+plt.xlim(-0.1, 0.32)
 plt.ylim(0.2, 0.7)
-for index in [3,4,5]:
+
+for indice, index in  enumerate([0,1,2]):
     data_computational = datos_comp[nombres[index]]
     data_computational = [(i-min(data_computational))/(max(data_computational)-min(data_computational)) for i in data_computational]
-    Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= datos_obs, datos_comp= data_computational)
-
+    Slopes, Per95 =  calculate_slopes_for_fit_medians_and_Per95(datos_obs= datos_obs, datos_comp= data_computational, box_count=box_count[indice])
+    print(min(Slopes))
     # Dividir los puntos por encima y por debajo del threshold
     datos_filtrados = [(x, y) for x, y in zip(Slopes, Per95) if y > threshold[index-3]]
     X_filtrado, Y_filtrado = zip(*datos_filtrados)
@@ -125,17 +133,17 @@ for index in [3,4,5]:
     # Obtener la pendiente y la intersección
     pendiente = modelo.coef_[0]
     interseccion = modelo.intercept_
-
+    print(pendiente)
     # Crear el plot con colores diferentes para por encima y por debajo del threshold
-    Scater = plt.scatter(Slopes, Per95, edgecolors=colors[index], facecolors='white', marker=markers[index-3], label = nombres[index])
+    Scater = plt.scatter(Slopes, Per95, edgecolors=colores[indice], facecolors='white', marker=markers[indice], label = nombres[index])
     X_plot = np.linspace(min(X_filtrado), max(X_filtrado), 100)
     plt.plot(X_plot, modelo.predict(X_plot), color='k', linestyle = "--", label='_nolegend_')
 
-    plt.axhline(threshold[index-3], linestyle='--', color=colors[index], label='_nolegend_')
+    plt.axhline(threshold[indice], linestyle='--', color=colores[indice], label='_nolegend_')
 
-plt.legend(['BC', 'CC', 'DC'])
 plt.xlabel('Slope Linear Fit')
 plt.ylabel(r'$P_{95}$(Traffic Intensity)')
+#plt.legend(['BC', 'CC', 'DC'],bbox_to_anchor=(1.05, 1), loc='upper center')
 
 #Agregando texto
 '''

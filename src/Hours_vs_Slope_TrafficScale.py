@@ -83,8 +83,8 @@ for key in list(colors.keys()):
         colors[key] = lighter_color
 
 #Conjunto de archivos
-N505 = [Datos_computacionales[0], Datos_observacionales[2]]
-N1207 = [Datos_computacionales[1], Datos_observacionales[0]]
+N505 = [Datos_computacionales[0], Datos_observacionales[6]] ## 3,4,5
+N1207 = [Datos_computacionales[1], Datos_observacionales[0]] ## 0,1,2
 datos_comp_N505 = pd.read_csv(N505[0])
 datos_obs_N505 = pd.read_csv(N505[1])
 datos_comp_N1207 = pd.read_csv(N1207[0])
@@ -106,12 +106,23 @@ for datos_comp, datos_obs, label in zip(data_computacional, data_observacional, 
 
             columnas_elejidas = obtener_nombres_con_H_M_sinFDS(datos_obs.columns, hora_exacta=(hora_in, minuto_in))
             data_observacional = datos_obs[columnas_elejidas].values.tolist()
+            
+            ## Controlando que esten entrando lista de numeros
+            if isinstance(data_observacional[0], list):
+                if all(isinstance(elem, list) for elem in data_observacional[0]):
+                    print( "La variable es una lista de listas.")
+                elif all(isinstance(elem, (int, float)) for elem in data_observacional[0]):
+                    print( "La variable es una lista de números.")
+                else:
+                    print( "La variable es una lista, pero no de listas ni de números.")
+            else:
+                print( "La variable no es una lista.")
+            
             data_observacional = reescalar_lista_de_listas(data_observacional, 255) # Reescalando los data_observacional de 0 a 1
 
             # Obtener el promedio de cada nodo sobre los dias en el instante de tiempo
             list_of_mean_of_each_node = [np.mean(data) for data in data_observacional]
             percentil_95 = np.percentile(list_of_mean_of_each_node, 95)
-
             #Guardanto datos
             P95_per_instant_of_time.append(percentil_95)
             instants_of_observation.append(f"{hora_in}:{minuto_in}".format(hora_in, minuto_in))
@@ -168,48 +179,8 @@ for i, f, perc in zip(intervals_minutes, intervals_minutes_end, P95_per_instant_
 
     gris  = prec #continuos
 
-    #Opcion1
-    '''
-    if prec >= 0.95:
-        gris = 1
-    elif (prec >= 0.75) and (prec < 0.95) :
-        gris = 0.666
-    elif (prec >= 0.50) and (prec < 0.75) :
-        gris = 0.333
-    else:
-        gris = 0     
-    '''
-    '''
-    #Opcion2
-    if prec >= 0.95:
-        gris = 1
-    elif (prec >= 0.85) and (prec < 0.95) :
-        gris = 0.8
-    elif (prec >= 0.70) and (prec < 0.85) :
-        gris = 0.6
-    elif (prec >= 0.50) and (prec < 0.70) :
-        gris = 0.4
-    elif (prec >= 0.25) and (prec < 0.50) :
-        gris = 0.2
-    else:
-        gris = 0     
-    '''
-
-
     axs[0].axvspan(i-7.5, f-7.5, facecolor=(gris,gris,gris), alpha = 0.9)
 axs[0].axvspan(intervals_minutes_end[-1]-7.5, intervals_minutes_end[-1], facecolor=(0,0,0), alpha = 0.9)
-
-'''#Opcion2
-boundaries = [[0.0, 0.25],[0.25,0.50],[0.5, 0.70],[0.70,0.85],[0.85, 0.95],[0.95, 1]]
-discrete_colors = [(0,0,0), (0.2,0.2,0.2), (0.4,0.4,0.4), (0.6,0.6,0.6), (0.8,0.8,0.8), (1,1,1)]
-
-'''
-'''
-#Opcion1
-boundaries = [[0.0, 0.50],[0.5, 0.75],[0.75, 0.95],[0.95, 1]]
-discrete_colors = [(0,0,0), (0.33,0.33,0.33), (0.66,0.66,0.66), (1,1,1)]
-'''
-
 
 # continuos
 boundaries = generate_boundaries(50)

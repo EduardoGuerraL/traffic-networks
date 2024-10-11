@@ -43,7 +43,6 @@ class DataImages:
 
         self.lanes = eval(open(str(path_dir_network_data)+"/Carriles.dat", "r").readline())
 
-
     def getAllDataInOneH5(self, name_of_file):
         """
         Es la primera función que se devería usar, así luego solo trabajamos con este archivo, en vez de todas las imagenes.
