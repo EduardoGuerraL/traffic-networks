@@ -3,7 +3,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-import random
 
 class NetworkData:
     def __init__(self, path_dir_network_data: str, path_img_without_traffic: str):
@@ -19,11 +18,11 @@ class NetworkData:
 
         ## Open the data from network Creator.
         # node_positions --> fraction_pos_intersections (fraction of img)
-        # node_conections --> intersection_2_intersection
+        # node_conections --> intersection_2_intersection (inter_conection)
         # lanes --> street_lanes
         fraction_pos_intersections = eval(open(str(path_dir_network_data)+"/node_positions.dat", "r").readline())
-        self.Edges = eval(open(str(path_dir_network_data)+"/node_conections.dat", "r").readline()) #Conexiones
-        self.lanes = eval(open(str(path_dir_network_data)+"/lanes_of_link.dat", "r").readline())#Carriles por calle
+        self.inter_conections = eval(open(str(path_dir_network_data)+"/node_conections.dat", "r").readline()) #Conexiones
+        self.street_lanes = eval(open(str(path_dir_network_data)+"/lanes_of_link.dat", "r").readline())#Carriles por calle
         
         
         # Rezise position of intersections to img coordinates
@@ -32,7 +31,7 @@ class NetworkData:
             self.pos_intersections[i] = list([tupla[0]*self.img_without_traffic.shape[1], tupla[1]*self.img_without_traffic.shape[0]])        
 
         # Pass intersections to links and streets to nodes.
-        dict_Edges =  dict(enumerate(self.Edges))
+        dict_Edges =  dict(enumerate(self.inter_conections))
         self.StreetsNodes = []
         for i in range(len(dict_Edges)):
             for j in range(len(dict_Edges)):
@@ -40,14 +39,16 @@ class NetworkData:
                     self.StreetsNodes.append((i,j))
 
         ## Use Networkx to make network
+        # DiGraph --> DG
+        # Graph --> UG
         
-        # Intersections To Nodes
-        self.DiGraphNodes = nx.DiGraph(self.Edges)
-        self.GraphNodes = nx.Graph(self.Edges)
+        # Intersections To Nodes(_inter)
+        self.DG_inter = nx.DiGraph(self.inter_conections)
+        self.UG_inter = nx.Graph(self.inter_conections)
         
         # Streets to Nodes
-        self.DiGraphEdges = nx.DiGraph(self.StreetsNodes)
-        self.GraphEdges = nx.Graph(self.StreetsNodes)
+        self.DG_streets = nx.DiGraph(self.StreetsNodes)
+        self.UG_streets = nx.Graph(self.StreetsNodes)
     
     #funciones de creación de datos basicos
     def makeDataFrame(self, dict_to_column: dict, column_name:str, index_name:str = "Nodo"):
@@ -95,12 +96,12 @@ class NetworkData:
         "BC, CC, DC, DiBC, DiCC, DiDC"
         """
         #Indices basicos para agregar al dataFrame
-        BC = nx.betweenness_centrality(self.GraphNodes)
-        CC = nx.closeness_centrality(self.GraphNodes)
-        DC = nx.degree_centrality(self.GraphNodes)
-        DiBC = nx.betweenness_centrality(self.DiGraphNodes)
-        DiCC = nx.closeness_centrality(self.DiGraphNodes)
-        DiDC = nx.degree_centrality(self.DiGraphNodes)
+        BC = nx.betweenness_centrality(self.UG_inter)
+        CC = nx.closeness_centrality(self.UG_inter)
+        DC = nx.degree_centrality(self.UG_inter)
+        DiBC = nx.betweenness_centrality(self.DG_inter)
+        DiCC = nx.closeness_centrality(self.DG_inter)
+        DiDC = nx.degree_centrality(self.DG_inter)
 
         df = self.makeDataFrame(BC, "BC")
         df = self.addColumnToDataFrame(df, CC, "CC")
@@ -123,42 +124,42 @@ class NetworkData:
         #Orden de conexiones que tiene el dataFrame, el cual debemos seguir
         import ast
     
-        dict_Edges = dict(enumerate(self.Edges))
+        dict_Edges = dict(enumerate(self.inter_conections))
 
-        EdgeBetwenness = nx.betweenness_centrality(self.DiGraphEdges)
+        EdgeBetwenness = nx.betweenness_centrality(self.DG_streets)
         EdgeBetwenness = {clave: valor for clave, valor in EdgeBetwenness.items()}
-        EdgeBetwenness = {self.Edges[i]:valor for i, valor in EdgeBetwenness.items()}
-        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.Edges)}
+        EdgeBetwenness = {self.inter_conections[i]:valor for i, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.inter_conections)}
         
-        EdgesCloseness = nx.closeness_centrality(self.DiGraphEdges)
+        EdgesCloseness = nx.closeness_centrality(self.DG_streets)
         EdgesCloseness = {clave: valor for clave, valor in EdgesCloseness.items()}
-        EdgesCloseness = {self.Edges[i]:valor for i, valor in EdgesCloseness.items()}
-        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.Edges)}
+        EdgesCloseness = {self.inter_conections[i]:valor for i, valor in EdgesCloseness.items()}
+        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.inter_conections)}
 
-        EdgesDegree = nx.degree_centrality(self.DiGraphEdges)
+        EdgesDegree = nx.degree_centrality(self.DG_streets)
         EdgesDegree = {clave: valor for clave, valor in EdgesDegree.items()}
-        EdgesDegree = {self.Edges[i]:valor for i, valor in EdgesDegree.items()}
-        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.Edges)}
+        EdgesDegree = {self.inter_conections[i]:valor for i, valor in EdgesDegree.items()}
+        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.inter_conections)}
 
         df = self.makeDataFrame(dict_Edges, "Conections")
         df = self.addColumnToDataFrame(df, EdgeBetwenness, "DiBC")
         df = self.addColumnToDataFrame(df, EdgesCloseness, "DiCC")
         df = self.addColumnToDataFrame(df, EdgesDegree, "DiDC")
 
-        EdgeBetwenness = nx.betweenness_centrality(self.GraphEdges)
+        EdgeBetwenness = nx.betweenness_centrality(self.UG_streets)
         EdgeBetwenness = {clave: valor for clave, valor in EdgeBetwenness.items()}
-        EdgeBetwenness = {self.Edges[i]:valor for i, valor in EdgeBetwenness.items()}
-        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.Edges)}
+        EdgeBetwenness = {self.inter_conections[i]:valor for i, valor in EdgeBetwenness.items()}
+        EdgeBetwenness = {index : EdgeBetwenness[clave] for index, clave in enumerate(self.inter_conections)}
         
-        EdgesCloseness = nx.closeness_centrality(self.GraphEdges)
+        EdgesCloseness = nx.closeness_centrality(self.UG_streets)
         EdgesCloseness = {clave: valor for clave, valor in EdgesCloseness.items()}
-        EdgesCloseness = {self.Edges[i]:valor for i, valor in EdgesCloseness.items()}
-        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.Edges)}
+        EdgesCloseness = {self.inter_conections[i]:valor for i, valor in EdgesCloseness.items()}
+        EdgesCloseness = {index : EdgesCloseness[clave] for index, clave in enumerate(self.inter_conections)}
 
-        EdgesDegree = nx.degree_centrality(self.GraphEdges)
+        EdgesDegree = nx.degree_centrality(self.UG_streets)
         EdgesDegree = {clave: valor for clave, valor in EdgesDegree.items()}
-        EdgesDegree = {self.Edges[i]:valor for i, valor in EdgesDegree.items()}
-        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.Edges)}
+        EdgesDegree = {self.inter_conections[i]:valor for i, valor in EdgesDegree.items()}
+        EdgesDegree = {index : EdgesDegree[clave] for index, clave in enumerate(self.inter_conections)}
 
         df = self.addColumnToDataFrame(df, EdgeBetwenness, "BC")
         df = self.addColumnToDataFrame(df, EdgesCloseness, "CC")
@@ -169,8 +170,8 @@ class NetworkData:
 
     #Funciones de entrega de caracteristicas
     def getAdjacencyMatrix(self):
-        Adjacency_matrix_edges = np.array(nx.adjacency_matrix(self.DiGraphEdges, nodelist=sorted(self.DiGraphEdges.nodes())).todense())
-        Adjacency_matrix_nodes = np.array(nx.adjacency_matrix(self.DiGraphNodes, nodelist=sorted(self.DiGraphNodes.nodes())).todense())
+        Adjacency_matrix_edges = np.array(nx.adjacency_matrix(self.DG_streets, nodelist=sorted(self.DG_streets.nodes())).todense())
+        Adjacency_matrix_nodes = np.array(nx.adjacency_matrix(self.DG_inter, nodelist=sorted(self.DG_inter.nodes())).todense())
 
         return Adjacency_matrix_nodes, Adjacency_matrix_edges
 
@@ -206,7 +207,7 @@ class NetworkData:
             return lenghts
         
 
-        largo_de_calles = long_of_streets(self.pos_intersections, self.Edges)
+        largo_de_calles = long_of_streets(self.pos_intersections, self.inter_conections)
         
         cantidad_de_autos_por_calle = {indice : round( largo * factor_escala ) for indice, largo in largo_de_calles.items()}
 
@@ -231,19 +232,19 @@ class NetworkData:
 
         #Indice que graficaremos
         indice = list(dataframe[str(column_name)])
-        indices_ordenado = [indice[i] for i in self.DiGraphNodes.nodes()]
+        indices_ordenado = [indice[i] for i in self.DG_inter.nodes()]
 
         #grafica para direccionados
         if directed is True:
             
-            nx.draw_networkx_edges(self.DiGraphNodes, self.pos_intersections, width= 0.3 , arrowsize=5, node_size=15)
-            nodes=nx.draw_networkx_nodes(self.DiGraphNodes, self.pos_intersections, node_size= width_node, node_color=indices_ordenado, cmap= plt.cm.Reds)
+            nx.draw_networkx_edges(self.DG_inter, self.pos_intersections, width= 0.3 , arrowsize=5, node_size=15)
+            nodes=nx.draw_networkx_nodes(self.DG_inter, self.pos_intersections, node_size= width_node, node_color=indices_ordenado, cmap= plt.cm.Reds)
             plt.axis('off')
                 
         #grafica para no direccionados
         elif directed is not True:
-            nx.draw_networkx_edges(self.GraphNodes, self.pos_intersections, width= 0.3, node_size=15)
-            nodes=nx.draw_networkx_nodes(self.GraphNodes, self.pos_intersections, node_size= width_node, node_color=indices_ordenado, cmap= plt.cm.Reds)
+            nx.draw_networkx_edges(self.UG_inter, self.pos_intersections, width= 0.3, node_size=15)
+            nodes=nx.draw_networkx_nodes(self.UG_inter, self.pos_intersections, node_size= width_node, node_color=indices_ordenado, cmap= plt.cm.Reds)
 
         plt.axis('off')
         cbar = plt.colorbar(nodes, label = str(column_name),shrink=0.9, aspect=30, pad = 0.01)
@@ -269,14 +270,14 @@ class NetworkData:
 
         #Indice que graficaremos
         indice = list(dataframe[str(column_name)])
-        indices_ordenado = [indice[i] for i in self.DiGraphEdges.nodes()]
+        indices_ordenado = [indice[i] for i in self.DG_streets.nodes()]
 
         #grafica para direccionados
         if directed is True:
             
-            #nx.draw_networkx_edges(self.DiGraphNodes, self.pos_intersections, width= 0.3 , arrowsize=5, node_size=15)
+            #nx.draw_networkx_edges(self.DG_inter, self.pos_intersections, width= 0.3 , arrowsize=5, node_size=15)
             plt.axis('off')
-            edges = nx.draw_networkx_edges(self.DiGraphNodes,
+            edges = nx.draw_networkx_edges(self.DG_inter,
                                             self.pos_intersections,
                                             arrowstyle="-|>",
                                             arrowsize=10,
@@ -306,7 +307,7 @@ class NetworkData:
         return Probabilidad    
  
     def randomwalkAnalitic_edges(self):
-        Adjacency_matrix = np.array(nx.adjacency_matrix(self.DiGraphEdges, nodelist=sorted(self.DiGraphEdges.nodes())).todense())
+        Adjacency_matrix = np.array(nx.adjacency_matrix(self.DG_streets, nodelist=sorted(self.DG_streets.nodes())).todense())
         
         Matrix_B = (Adjacency_matrix.T/np.sum(Adjacency_matrix.transpose(), axis=0)) - np.identity(len(Adjacency_matrix))
         autovalores, autovectores = np.linalg.eig(Matrix_B)
@@ -349,9 +350,13 @@ class NetworkData:
 if __name__ == "__main__":
     
     path_img_no_traffic = "data/raw/Images/screenshots/CleanScreenshot.png"
-    path_network_info = "data/processed/from_networkCreator/PuntaArenas"
-    path_network_info = "data/processed/from_networkCreator/PuntaArenasDetallado"
+    path_network_N505 = "data/processed/from_networkCreator/PuntaArenas"
+    path_network_N1207 = "data/processed/from_networkCreator/PuntaArenasDetallado"
 
+    PA_N1207 = NetworkData(path_network_N1207, path_img_no_traffic)
+    PA_N505 = NetworkData(path_network_N505, path_img_no_traffic)
+
+    print(PA_N1207.DG_inter)
 
     """
     PuntaArenasDetallado = NetworkData(path_network_info)
@@ -364,6 +369,8 @@ if __name__ == "__main__":
     print(df)
     df.to_csv("Simple_IndicesCentralidad.csv")
     """
+
+    '''
     path_medina = "data/DataMakeNetwork/Medina"
     Medina = NetworkData(path_medina)
 
@@ -385,6 +392,7 @@ if __name__ == "__main__":
 
     Matrix_Adj_edges = Medina.getAdjacencyMatrix()[1]
     print(Matrix_Adj_edges)
+    '''
 
 
     
