@@ -1,9 +1,3 @@
-#Ignota lo que está en temp
-data/Images
-
-
-*.png
-
 data/DataNetwork/InterAsNode
 data/DataNetwork/StreetAsNode/ResultData
 data/DataNetwork/StreetAsNode/txtes
