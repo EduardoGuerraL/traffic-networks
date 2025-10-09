@@ -81,6 +81,7 @@ Próximos pasos
  [] Integrar construcción automática de la red con OSMnx.
 
  [] Publicar resultados como artículo académico.
+'''
 
 Autores
 Eduardo Guerra – Físico, investigación en redes complejas y dinámica de tráfico.
