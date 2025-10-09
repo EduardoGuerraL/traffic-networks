@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 # Explorar los notebooks
 jupyter notebook notebooks/ (aún en contrucción)
-'''
+```
 
 Próximos pasos
 
@@ -81,7 +81,6 @@ Próximos pasos
  [] Integrar construcción automática de la red con OSMnx.
 
  [] Publicar resultados como artículo académico.
-'''
 
 Autores
 Eduardo Guerra – Físico, investigación en redes complejas y dinámica de tráfico.
