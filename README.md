@@ -1,29 +1,109 @@
-# Repoitorio se encuentra en proceso de construccion
-# Repositorio de Análisis de Tráfico Vehicular
+# 🚦 Traffic Networks: Análisis de congestión vehicular con teoría de redes complejas
 
-Este repositorio contiene datos y código relacionados con el análisis del tráfico vehicular. A continuación, se describe la estructura de carpetas y el contenido del repositorio.
+Este proyecto busca **estudiar la congestión vehicular en ciudades a partir de datos de Google Maps y teoría de redes complejas**.  
+El caso de estudio inicial es **Punta Arenas (Chile)**, pero la metodología es adaptable a cualquier ciudad.
 
-## Contenido del Repositorio
+---
 
-1. **data**: En esta carpeta se encuentran los datos utilizados en el análisis. Está subdividida en tres subcarpetas:
+## 📌 Objetivo
+Analizar si las métricas de centralidad en redes urbanas (closeness, betweenness, eigenvector, etc.)  
+se correlacionan con los niveles reales de congestión vehicular.
 
-   - **DataImages**: Contiene datos de imágenes en formato de píxeles para su procesamiento.
-   - **DataMakeNetwork**: Aquí se almacenan las redes vehiculares creadas manualmente en */NetworkCreator.py*.
-   - **DataNetwork**: Esta subcarpeta contiene datos relacionados con las características de las redes vehiculares creadas a mano.
+---
 
-2. **src**: En esta carpeta se encuentra el código fuente utilizado para analizar el tráfico vehicular. Está subdividida en dos subcarpetas:
+## 🔹 Flujo de trabajo
 
-   - **Packages**: Contiene paquetes y módulos con funciones y clases específicas para el análisis de tráfico.
-   - Archivos `.py`: Estos archivos contienen código que genera gráficos y visualizaciones relacionados con el análisis de tráfico.
+1. **Obtención de datos**
+   - Imágenes de tráfico vehicular descargadas desde la **API de Google Maps**.
+   - Imágenes tomadas cada **15 minutos durante ~2 meses**.
+   - Solo se consideran **días de semana** para evitar sesgos de fines de semana.
 
-3. **.gitignore**: Este archivo especifica qué archivos y carpetas se deben ignorar al realizar seguimiento con Git. Asegura que los archivos generados automáticamente o archivos sensibles no se incluyan en el repositorio.
+2. **Procesamiento de imágenes**
+   - Cada imagen contiene colores según el tráfico: verde, amarillo, rojo.
+   - Se extrae un **promedio de intensidad de tráfico por zona** en cada instante.
+   - Se genera una **escala lineal de tráfico** (0 = fluido, 1 = muy congestionado).
 
-## Instrucciones de Uso
+3. **Construcción de la red urbana**
+   - Inicialmente: creación **manual** de la red a partir de la dirección de calles.
+   - En desarrollo: **automatización con OSMnx**.
+   - Resultado: grafo dirigido con calles como aristas y esquinas como nodos.
 
-A continuación, se proporcionan instrucciones básicas para comenzar a trabajar con este repositorio:
+4. **Asignación de tráfico a la red**
+   - Cada nodo/arista recibe un valor de tráfico asociado al instante de tiempo correspondiente.
 
-1. En *src/Packages/GoogleScreenshot* podemos obtener imagenes del trafico vehicular dando las coordenadas de la ciudad que elegimos. Estas son tomadas cada cuarto de hora por el tiempo que se desee.
-2. Con al menos una imagen, podemos crear una red direccionada en *src/Packages/NetworkCreator.py* tomando las intersecciones como nodos y las calles como links. Puede ser tan detallado como se desee. Si se les ocurre otra forma de ver los nodos y links también podria implementarse.
-3. Con  *src/Packages/GetDataFromImages.py* podemos convertir las imagenes a matrices de pixeles y linealizando podemos ver cada coordenada como un grado de trafico. Así obtenemos luego un grado de trafico para cada uno de los nodos que cremaos en 2.
-4. En *src/Packages/GetDataForNetwork.py* Obtenemos algunas caracteristicas de la red que creamos en 2, además se agregan algunas simulaciones de random walk.
-5. En la seccion principal hay varios graficos que estan siendo creados para poder visualizar los datos.
+5. **Análisis de redes complejas**
+   - Se calculan métricas: closeness, betweenness, eigenvector centrality.
+   - Se comparan con los valores de tráfico en el tiempo.
+
+6. **Resultados**
+   - Se observan correlaciones más fuertes entre **ciertas métricas de centralidad**  
+     y el tráfico vehicular en **horas de alta congestión**.
+
+---
+
+## 📊 Ejemplo de resultados
+
+- Gráficos comparando la evolución temporal de la congestión y las centralidades.
+- Mapas urbanos coloreados según el grado de centralidad vs congestión observada.
+
+*(Puedes insertar aquí imágenes de ejemplo de tus plots si quieres que el README brille).*
+
+---
+
+## 🔧 Tecnologías
+
+- **Python 3.12**
+- `pandas`, `numpy`
+- `matplotlib`, `seaborn`
+- `networkx`, `osmnx` (en desarrollo)
+- `opencv` (para procesamiento de imágenes)
+
+---
+
+## 📂 Estructura del repositorio
+
+traffic-networks/
+├── src/ # Código fuente organizado
+│ ├── data_processing/ # Procesamiento de imágenes y escalas de tráfico
+│ ├── network_analysis/ # Construcción y métricas de grafos
+│ ├── visualization/ # Gráficos y mapas
+│ └── utils/ # Funciones auxiliares
+├── notebooks/ # Análisis paso a paso en Jupyter
+│ ├── 01_data_exploration.ipynb
+│ ├── 02_build_network.ipynb
+│ ├── 03_centrality_analysis.ipynb
+│ └── 04_results_and_plots.ipynb
+├── data/ # (no incluido, solo instrucciones para obtenerlo)
+│ └── README.md
+├── requirements.txt # Librerías necesarias
+└── README.md
+
+
+
+---
+
+## 🚀 Cómo usar el proyecto
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/EduardoGuerraL/CellAuToTraffic
+cd traffic-networks
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Explorar los notebooks
+jupyter notebook notebooks/
+
+📌 Próximos pasos
+
+ Automatizar la descarga de imágenes desde Google Maps.
+
+ Integrar construcción automática de la red con OSMnx.
+
+ Publicar resultados como artículo académico.
+
+ ✍️ Autores
+Eduardo Guerra – Físico, investigación en redes complejas y dinámica de tráfico.
+Chilean Complexity Cluster, Universidad de Chile.
+
