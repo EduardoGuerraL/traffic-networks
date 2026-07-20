@@ -1,8 +1,16 @@
-#Ignota lo que está en temp
+# Entorno virtual (nunca versionar)
+.venv/
+venv/
+env/
+
+# Imagenes y datos crudos de trafico (se solicitan aparte / muy pesados)
+data/raw/Images/
+*.png
 data/Images
 
+__pycache__/
+*.pyc
 
-*.png
 
 data/DataNetwork/InterAsNode
 data/DataNetwork/StreetAsNode/ResultData
@@ -16,9 +24,14 @@ data/DataImages/In_Streets_Coord/Detallado/ForHour_sinFDS_meanS2_r1
 
 src/Funciones/__pycache__
 
-#exceden el maximo de tamaño
+#exceden el maximo de tamaño / muy pesados (se solicitan aparte)
 data/DataImages/DataMatrixImages.h5
 data/DataNetwork/StreetAsNode/ComplexNet_states_10mA_500BT_10mS_streets.csv
+data/raw/Images/screenshotsGoogleMaps.zip
+data/raw/Images/screenshotsGoogleMaps/
+data/processed/DataNetwork/StreetAsNode/txtes/
+data/processed/DataNetwork/StreetAsNode/ResultData/ComplexNet_Ehr*.csv
+data/processed/DataNetwork/StreetAsNode/ResultData/SimpleNet_Ehr*.csv
 
 #Progrmas de prueba
 src/functions/Funciones
