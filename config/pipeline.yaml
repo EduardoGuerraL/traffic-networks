@@ -1,0 +1,76 @@
+# Pipeline configuration for Punta Arenas traffic analysis
+# All paths are relative to project root (FinalVersion/)
+
+proyecto:
+  nombre: "transporte-punta-arenas"
+  descripcion: "Predicting vehicular traffic from complex street network topology"
+
+# Redes viales
+redes:
+  N505:
+    nombre: "SimpleNet (solo intersecciones)"
+    nodos: 505
+    network_data: "data/network/dat_files/PuntaArenas"
+    radio_optimo: 1
+    steps_optimo: 5
+    umbral_optimo:
+      DiCC: 0.329
+      CC: 0.332
+      DC: 0.319
+  N1207:
+    nombre: "ComplexNet (intersecciones + nodos intermedios)"
+    nodos: 1207
+    network_data: "data/network/dat_files/PuntaArenasDetallado"
+    radio_optimo: 1
+    steps_optimo: 5
+    umbral_optimo:
+      DiCC: 0.368
+      CC: 0.328
+      DC: 0.305
+
+# Combinaciones de muestreo (radio x steps)
+# S = steps + 1 (steps=2 -> S=3, steps=5 -> S=6, steps=9 -> S=10)
+combinaciones:
+  radios: [0, 1, 2, 3]
+  steps: [2, 5, 9]  # internamente S = steps + 1
+
+# Imágenes de tráfico
+imagenes:
+  dir: "data/raw/Images/screenshotsGoogleMaps/screenshots"
+  referencia: "2023-03-29_07-30.png"
+  instantes_totales: 92
+  solo_dias_semana: true
+
+# Índices topológicos disponibles
+topologia:
+  indices: ["BC", "DiBC", "CC", "DiCC", "DC", "DiDC"]
+  # Número de cajas (bins) para cuantiles por índice
+  n_boxes_map:
+    "DiBC": 15
+    "BC": 15
+    "DiCC": 20
+    "CC": 20
+    "DiDC": 3
+    "DC": 3
+
+# Barrido de umbrales (threshold sweep)
+umbrales:
+  n_puntos: 200
+  rango_factor: 0.8  # max * 0.8 para límite superior
+
+# Rutas de salida
+output:
+  combinaciones_dir: "data/processed/combinaciones"
+  centralidad_dir: "data/processed/DataNetwork/centrality_for_models"
+  resultados_dir: "results"
+  figures_dir: "notebooks/results/figures"
+  sweep_csv: "results/sweep_ranking.csv"
+
+# Valores de tráfico (mapeo colores Google Maps)
+traffic_values:
+  green: 64
+  orange: 128
+  red: 191
+  dark_red: 255
+  no_data: 0
+  max_value: 255

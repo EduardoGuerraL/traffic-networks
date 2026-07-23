@@ -34,4 +34,4 @@ data/processed/DataNetwork/StreetAsNode/ResultData/ComplexNet_Ehr*.csv
 data/processed/DataNetwork/StreetAsNode/ResultData/SimpleNet_Ehr*.csv
 
 #Progrmas de prueba
-src/functions/Funciones
+src/functions/Funciones*.h5
