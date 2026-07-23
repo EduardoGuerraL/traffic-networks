@@ -1,5 +1,4 @@
 from .basics import *
-<<<<<<< HEAD
 from .paths import (
     load_config,
     get_config,
@@ -20,11 +19,8 @@ from .paths import (
     PipelineConfig,
     RedConfig,
 )
-=======
->>>>>>> 9f41bbc1c3b3e7ede8868ef4f61cae4f0d1f72d8
 
 PACKAGE_NAME = "MyPackage"
 VERSION = "1.0"
 
 print("The package has been loaded successfully")
-# Additional initialization or setup code
