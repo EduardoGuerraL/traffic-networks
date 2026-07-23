@@ -4,7 +4,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-API_KEY = "AIzaSyBGmInnA0XmKh8AoW8SjlCVDEQzAhGyQtopip"
+API_KEY = ""
 CENTER = "53.349805,-6.26031"  # Ejemplo: Dublín
 ZOOM = 15
 SIZE = "640x640"
