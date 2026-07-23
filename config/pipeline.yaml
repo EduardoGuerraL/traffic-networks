@@ -36,8 +36,8 @@ combinaciones:
 
 # Imágenes de tráfico
 imagenes:
-  dir: "data/raw/Images/screenshotsGoogleMaps/screenshots"
-  referencia: "2023-03-29_07-30.png"
+  dir: "data/raw"
+  referencia: "CleanScreenshot.png"
   instantes_totales: 92
   solo_dias_semana: true
 
