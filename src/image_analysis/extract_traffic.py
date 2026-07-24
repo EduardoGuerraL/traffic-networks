@@ -19,9 +19,9 @@ from src.utils.paths import (
     iter_redes,
     iter_radios,
     iter_steps,
-    network_data_path,
 )
 from src.utils.basics import obtener_nombres_con_H_M_sinFDS
+from src.network.load_network import NetworkGraphLoader
 
 
 # Colores de tráfico de Google Maps (en RGB)
@@ -68,15 +68,18 @@ class ImageProcessor:
             raise FileNotFoundError(f"Referencia no encontrada: {ref_path}")
         self.img_h, self.img_w = ref_image.shape[:2]
         
-        # Cargar red vial
-        net_dir = network_data_path(red)
-        raw_positions = eval(open(net_dir / "Posiciones.dat").readline())
+        # Cargar red vial desde serialización
+        serialized_dir = Path(__file__).parent.parent.parent / "data" / "network" / "serialized" / red
+        loader = NetworkGraphLoader.load(serialized_dir)
+        
+        # Reconstruir position_of_vertices con coords float (igual que el original)
+        fraction_pos = loader._metadata["fraction_pos_intersections"]
         self.position_of_vertices = {
             i: [t[0] * self.img_w, t[1] * self.img_h]
-            for i, t in enumerate(raw_positions)
+            for i, t in enumerate(fraction_pos)
         }
-        self.connections = eval(open(net_dir / "Conexiones.dat").readline())
-        self.lanes = eval(open(net_dir / "Carriles.dat").readline())
+        self.connections = loader._metadata["inter_conections"]
+        self.lanes = loader.street_lanes
         
         # Pre-computar colores
         self._red_rgb = np.array([self._hex_to_rgb(c) for c in RED_COLORS])
