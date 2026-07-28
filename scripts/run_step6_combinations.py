@@ -4,10 +4,6 @@ Paso 6: Generar todas las combinaciones R×S (48 CSVs).
 Llama a generar_combinaciones.py existente.
 """
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 import generar_combinaciones
 
 if __name__ == "__main__":

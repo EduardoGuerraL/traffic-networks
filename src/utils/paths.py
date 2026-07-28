@@ -46,13 +46,13 @@ def load_config(config_path: Path | None = None) -> PipelineConfig:
     """Load and parse pipeline.yaml into typed config."""
     if config_path is None:
         config_path = Path(__file__).parent.parent.parent / "config" / "pipeline.yaml"
-    
+
     with open(config_path, "r", encoding="utf-8") as f:
         raw = yaml.safe_load(f)
-    
+
     # Resolve project root
     root = config_path.parent.parent
-    
+
     # Parse redes
     redes = {}
     for key, val in raw["redes"].items():
@@ -64,7 +64,7 @@ def load_config(config_path: Path | None = None) -> PipelineConfig:
             steps_optimo=val["steps_optimo"],
             umbral_optimo=val.get("umbral_optimo", {}),
         )
-    
+
     return PipelineConfig(
         proyecto=raw["proyecto"]["nombre"],
         redes=redes,
@@ -118,13 +118,9 @@ def combinaciones_path(tipo: str, red: str, radio: int, steps: int) -> Path:
 
 
 def centralidad_path(red: str) -> Path:
-    """Path to all_data_{SimpleNet,ComplexNet}_new.csv"""
-    cfg = get_config()
-    if red == "N505":
-        return cfg.centralidad_dir / "all_data_SimpleNet_new.csv"
-    elif red == "N1207":
-        return cfg.centralidad_dir / "all_data_ComplexNet_new.csv"
-    raise ValueError(f"Red desconocida: {red}")
+    """Path to serialized network centrality CSV (indices_centralidad.csv)."""
+    root = Path(__file__).parent.parent.parent
+    return root / "data" / "network" / "serialized" / red / "centrality" / "indices_centralidad.csv"
 
 
 def sweep_csv_path() -> Path:
@@ -176,20 +172,20 @@ def validate_paths() -> List[str]:
     """Check that critical input paths exist. Returns list of missing paths."""
     cfg = get_config()
     missing = []
-    
+
     for red_name, red in cfg.redes.items():
         for f in ["Posiciones.dat", "Conexiones.dat", "Carriles.dat"]:
             p = red.network_data / f
             if not p.exists():
                 missing.append(str(p))
-    
+
     if not cfg.imagenes_dir.exists():
         missing.append(str(cfg.imagenes_dir))
-    
+
     ref = cfg.imagenes_dir / cfg.imagenes_referencia
     if not ref.exists():
         missing.append(str(ref))
-    
+
     return missing
 
 
@@ -202,12 +198,13 @@ if __name__ == "__main__":
     print(f"Steps: {cfg.steps}")
     print(f"Topología: {cfg.topologia_indices}")
     print(f"Combinaciones dir: {cfg.combinaciones_dir}")
-    
+
     # Test path builders
     print(f"\nN505 network_data: {network_data_path('N505')}")
     print(f"N505 r1s5 mean: {combinaciones_path('mean', 'N505', 1, 5)}")
+    print(f"N505 centralidad: {centralidad_path('N505')}")
     print(f"N1207 centralidad: {centralidad_path('N1207')}")
-    
+
     missing = validate_paths()
     if missing:
         print(f"\n⚠️ Missing paths: {missing}")

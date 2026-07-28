@@ -61,7 +61,7 @@ umbrales:
 # Rutas de salida
 output:
   combinaciones_dir: "data/processed/combinaciones"
-  centralidad_dir: "data/processed/DataNetwork/centrality_for_models"
+  centralidad_dir: "data/network/serialized"
   resultados_dir: "results"
   figures_dir: "notebooks/results/figures"
   sweep_csv: "results/sweep_ranking.csv"

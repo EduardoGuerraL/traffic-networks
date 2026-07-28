@@ -1,146 +1,91 @@
 """
-Paso 4: Cálculo de centralidad de redes.
-Genera BC, CC, DC para dirigidas y no dirigidas × 2 redes = 12 combinaciones.
+Genera y guarda los datos computacionales de ambas redes serializadas.
 
-Utiliza redes serializadas via NetworkGraphLoader (no reconstruye la red).
+Salida:
+    data/network/serialized/{N505,N1207}/centrality/
+        - indices_centralidad.csv   (DiBC, DiCC, DiDC, BC, CC, DC)
+        - all_data.csv              (centralidad + conections)
 """
 
 from __future__ import annotations
+
+import sys
 from pathlib import Path
 
 import networkx as nx
 import pandas as pd
 import numpy as np
+import math
 
-from src.utils.paths import (
-    get_config,
-    centralidad_path,
-    iter_redes,
-)
+_project_root = str(Path(__file__).resolve().parent.parent.parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
 from src.network.load_network import NetworkGraphLoader
 
 
-def compute_centrality(red: str) -> pd.DataFrame:
-    """
-    Calcula todas las centralidades para una red cargando la red serializada.
+SERIALIZED_DIR = Path(_project_root) / "data" / "network" / "serialized"
 
-    Returns DataFrame con columnas: BC, CC, DC, DiBC, DiCC, DiDC.
-    """
-    cfg = get_config()
+NETWORKS = {
+    "N505": SERIALIZED_DIR / "N505",
+    "N1207": SERIALIZED_DIR / "N1207",
+}
 
-    # Directorio serializado
-    serialized_dir = Path(__file__).parent.parent.parent / "data" / "network" / "serialized" / red
-    loader = NetworkGraphLoader.load(str(serialized_dir))
 
+def compute_centrality(loader: NetworkGraphLoader) -> pd.DataFrame:
+    """Calcula centralidades desde la red serializada."""
     DG_streets = loader.DG_streets
     UG_streets = loader.UG_streets
-    DG_inter = loader.DG_inter
-    UG_inter = loader.UG_inter
 
-    results = {}
+    nodes = sorted(DG_streets.nodes())
+    inter_conections = loader.inter_conections
+    conections = {i: tuple(c) for i, c in enumerate(inter_conections)}
 
-    # Betweenness
-    results['BC'] = nx.betweenness_centrality(UG_streets)
-    results['DiBC'] = nx.betweenness_centrality(DG_streets)
+    DiBC = nx.betweenness_centrality(DG_streets)
+    DiCC = nx.closeness_centrality(DG_streets)
+    DiDC = nx.degree_centrality(DG_streets)
+    BC = nx.betweenness_centrality(UG_streets)
+    CC = nx.closeness_centrality(UG_streets)
+    DC = nx.degree_centrality(UG_streets)
 
-    # Closeness
-    results['CC'] = nx.closeness_centrality(UG_streets)
-    results['DiCC'] = nx.closeness_centrality(DG_streets)
-
-    # Degree
-    results['DC'] = nx.degree_centrality(UG_streets)
-    results['DiDC'] = nx.degree_centrality(DG_streets)
-
-    # Intersection centralities (optional)
-    results['BC_inter'] = nx.betweenness_centrality(UG_inter)
-    results['CC_inter'] = nx.closeness_centrality(UG_inter)
-    results['DC_inter'] = nx.degree_centrality(DG_inter)
-
-    # Random walk analytic (using the same logic as old NetworkData)
-    results['mean_state_RW'] = _randomwalk_analytic_edges(DG_streets)
-    results['mean_state_RW_lim'] = _randomwalk_analytic_nodes(UG_inter)
-
-    # Max occupation (Ehrenfest scaling)
-    results['MaxOcupation'] = _get_max_particles_per_urns(
-        loader.pos_intersections, loader.inter_conections
-    )
-
-    # Build DataFrame
-    n_nodes = len(DG_streets.nodes())
-    df = pd.DataFrame(index=range(n_nodes))
-    for col, vals in results.items():
-        df[col] = [vals.get(i, 0) for i in range(n_nodes)]
-
+    df = pd.DataFrame({
+        "Nodo": nodes,
+        "Conections": [str(conections[n]) for n in nodes],
+        "DiBC": [DiBC[n] for n in nodes],
+        "DiCC": [DiCC[n] for n in nodes],
+        "DiDC": [DiDC[n] for n in nodes],
+        "BC": [BC[n] for n in nodes],
+        "CC": [CC[n] for n in nodes],
+        "DC": [DC[n] for n in nodes],
+    })
+    df.set_index("Nodo", inplace=True)
     return df
 
 
-def _randomwalk_analytic_edges(DG_streets: nx.DiGraph) -> dict:
-    """Random walk analítico sobre grafo dirigido de calles (replica el código viejo)."""
-    Adjacency_matrix = np.array(
-        nx.adjacency_matrix(DG_streets, nodelist=sorted(DG_streets.nodes())).todense()
-    )
-    Matrix_B = (Adjacency_matrix.T / np.sum(Adjacency_matrix.transpose(), axis=0)) - np.identity(
-        len(Adjacency_matrix)
-    )
-    autovalores, autovectores = np.linalg.eig(Matrix_B)
-    indice = next((i for i, valor in enumerate(autovalores) if abs(valor) < 1e-15), 0)
-    Probabilidad = [i / sum(autovectores[:, indice]) for i in autovectores[:, indice]]
-    Probabilidad = {i: np.real(valor) for i, valor in enumerate(Probabilidad)}
-    return Probabilidad
+def main():
+    for red_key, net_dir in NETWORKS.items():
+        print(f"\n=== {red_key} ===")
 
+        loader = NetworkGraphLoader.load(str(net_dir))
+        print(f"  Cargada: {loader}")
 
-def _randomwalk_analytic_nodes(UG_inter: nx.Graph) -> dict:
-    """Random walk analítico sobre grafo no dirigido de intersecciones (replica el código viejo)."""
-    Adjacency_matrix = np.array(
-        nx.adjacency_matrix(UG_inter, nodelist=sorted(UG_inter.nodes())).todense()
-    )
-    Matrix_B = (Adjacency_matrix.T / np.sum(Adjacency_matrix.transpose(), axis=0)) - np.identity(
-        len(Adjacency_matrix)
-    )
-    autovalores, autovectores = np.linalg.eig(Matrix_B)
-    indice = next((i for i, valor in enumerate(autovalores) if abs(valor) < 1e-15), 0)
-    Probabilidad = [i / sum(autovectores[:, indice]) for i in autovectores[:, indice]]
-    Probabilidad = {i: np.real(valor) for i, valor in enumerate(Probabilidad)}
-    return Probabilidad
+        df = compute_centrality(loader)
 
+        out_dir = net_dir / "centrality"
+        out_dir.mkdir(parents=True, exist_ok=True)
 
-def _get_max_particles_per_urns(
-    pos_intersections: dict, inter_conections: list, factor_escala: float = 1.876
-) -> dict:
-    """Calcula capacidad máxima de autos por calle (replica el código viejo)."""
-    def calcular_distancia(coord1, coord2):
-        x1, y1 = coord1
-        x2, y2 = coord2
-        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        # Guardar solo centralidad
+        centrality_path = out_dir / "indices_centralidad.csv"
+        df.to_csv(centrality_path)
+        print(f"  Guardado: {centrality_path} ({df.shape})")
 
-    import math
-    lenghts = {}
-    for index, conection in enumerate(inter_conections):
-        lenghts[index] = calcular_distancia(
-            pos_intersections[list(conection)[0]],
-            pos_intersections[list(conection)[1]],
-        )
-    return {indice: round(largo * factor_escala) for indice, largo in lenghts.items()}
+        # Guardar all_data (mismo formato que los CSVs originales en ResultData)
+        all_data_path = out_dir / "all_data.csv"
+        df.to_csv(all_data_path)
+        print(f"  Guardado: {all_data_path} ({df.shape})")
 
-
-def save_centrality(red: str, df: pd.DataFrame) -> Path:
-    """Guarda DataFrame de centralidad en centralidad_path."""
-    path = centralidad_path(red)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(path, index=False)
-    print(f"  Guardado: {path} ({df.shape})")
-    return path
-
-
-def run_step4(redes: list[str] | None = None):
-    """Calcula y guarda centralidades para todas las redes."""
-    redes = redes or iter_redes()
-
-    for r in redes:
-        print(f"\n=== Centralidad: {r} ===")
-        df = compute_centrality(r)
-        save_centrality(r, df)
+    print("\nListo.")
 
 
 if __name__ == "__main__":
-    run_step4()
+    main()

@@ -35,3 +35,5 @@ data/processed/DataNetwork/StreetAsNode/ResultData/SimpleNet_Ehr*.csv
 
 #Progrmas de prueba
 src/functions/Funciones*.h5
+*.txt
+*.csv

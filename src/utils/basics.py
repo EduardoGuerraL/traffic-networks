@@ -66,11 +66,11 @@ def txt_to_csv(archivo_entrada, archivo_salida, steps):
             # Write the column names as the first row
             column_names = ["nodo"] + [f"{i * steps_column}" for i in range(1, len(transposed_data[0]))]
             file.write(",".join(column_names) + "\n")
-            
+
             # Write the transposed data to the file in the desired format
             for idx, row in enumerate(transposed_data):
                 file.write(f"{idx}, {', '.join(str(num) for num in row)}\n")
-    
+
     data = read_data_from_file(archivo_entrada)
 
     # Transpose the data
@@ -183,12 +183,12 @@ def crearNintervalosOrdenados(X, Y, N):
         X_ordenado, Y_ordenado = zip(*pares_ordenados)
 
         return list(X_ordenado), list(Y_ordenado)
-    
+
     X, Y = ordenar_listas(X,Y)
 
     # Calcula el rango de valores de X
     rango_x = max(X) - min(X)
-    
+
     # Calcula el tamaño del intervalo
     tam_intervalo = rango_x / N
 
@@ -224,18 +224,18 @@ def plot_distribution(data, name):
     # Ajustar el tamaño de las fuentes de los ejes X e Y
     ax.tick_params(axis='x', labelsize=18)  # Tamaño de fuente para el eje X
     ax.tick_params(axis='y', labelsize=18)  # Tamaño de fuente para el eje Y
-    
+
     # Ajustar la cantidad de ticks en los ejes X e Y
     #ax.set_xticks([0.007, 0.01, 0.013, 0.016])
     #ax.set_yticks([0.1, 0.3, 0.5])
 
     # Ajustar el tamaño de las fuentes en las etiquetas y títulos
-    
+
     ax.set_xlabel(rf'${name}$', fontsize=18)
     ax.set_ylabel(rf'$P[{name}]$', fontsize=18, rotation = 0)
-    
+
     # Ajustar las coordenadas de las etiquetas de los ejes X e Y
-    ax.xaxis.set_label_coords(1.04, 0.04)  
+    ax.xaxis.set_label_coords(1.04, 0.04)
     ax.yaxis.set_label_coords(0, 1.01)
 
     # Eliminar el contorno superior y derecho del gráfico

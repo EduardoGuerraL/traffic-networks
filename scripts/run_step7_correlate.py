@@ -4,10 +4,6 @@ Paso 7: Correlación comp vs obs por instante (slope, R², P95).
 Genera figuras para una combinación dada.
 """
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 import argparse
 import pandas as pd
 from src.utils.paths import centralidad_path, combinaciones_path

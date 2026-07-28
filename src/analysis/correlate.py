@@ -94,13 +94,101 @@ def get_traffic_stats_per_instant(datos_obs: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(stats)
 
 
+SLOT_COLUMNS = [f"{h:02d}-{m:02d}" for h in range(24) for m in (0, 15, 30, 45)]
+
+
+def correlate_with_aggregated(
+    datos_comp: pd.DataFrame,
+    datos_obs: pd.DataFrame,
+    topology_index: str,
+    n_boxes: int | None = None,
+) -> pd.DataFrame:
+    """
+    Correlaciona centralidad vs tráfico agregado por slot de 15 min.
+
+    Para cada uno de los 96 slots, calcula pendiente y R² de la regresión
+    lineal entre centralidad ( bins cuantílicos ) y tráfico mediano.
+
+    Args:
+        datos_comp: DataFrame de centralidad (una fila por arista).
+                    Debe contener columna 'Conections' y la topología pedida.
+        datos_obs:  DataFrame de tráfico agregado (traffic_stats_*_mean_*.csv).
+                    Debe contener 'connection' y columnas de slot 'HH-MM'.
+        topology_index: Nombre de la columna de centralidad (p.ej. 'DiCC').
+        n_boxes: Número de bins cuantílicos. Si None, usa config.
+
+    Returns:
+        DataFrame con columnas: slot, slope, r2, p95, n_used
+    """
+    if n_boxes is None:
+        n_boxes = n_boxes_for(topology_index)
+
+    centr_col = datos_comp[topology_index].values.astype(float)
+    c_min, c_max = centr_col.min(), centr_col.max()
+    centr_norm = (centr_col - c_min) / (c_max - c_min) if c_max > c_min else centr_col * 0
+
+    comp_conns = datos_comp["Conections"].astype(str).str.strip()
+    obs_conns = datos_obs["connection"].astype(str).str.strip()
+
+    common = comp_conns[comp_conns.isin(obs_conns)].index
+    if len(common) < 3:
+        return pd.DataFrame(columns=["slot", "slope", "r2", "p95", "n_used"])
+
+    centr_aligned = centr_norm[common]
+    comp_idx = common
+
+    slot_to_obs_idx = {}
+    for slot in SLOT_COLUMNS:
+        if slot in datos_obs.columns:
+            slot_to_obs_idx[slot] = obs_conns[obs_conns.isin(comp_conns)].index
+
+    results = []
+    for slot in SLOT_COLUMNS:
+        if slot not in datos_obs.columns:
+            results.append({"slot": slot, "slope": np.nan, "r2": np.nan,
+                            "p95": np.nan, "n_used": 0})
+            continue
+
+        obs_idx = slot_to_obs_idx[slot]
+        traffic_vals = datos_obs.loc[obs_idx, slot].values.astype(float)
+
+        mask = ~np.isnan(traffic_vals)
+        x = centr_aligned[obs_idx[mask]]
+        y = traffic_vals[mask]
+
+        if len(x) < 3:
+            results.append({"slot": slot, "slope": 0.0, "r2": 0.0,
+                            "p95": np.percentile(y, 95) if len(y) > 0 else 0.0,
+                            "n_used": len(x)})
+            continue
+
+        x_med, y_med = calculate_median_positions(x.tolist(), y.tolist(), n_boxes)
+
+        if len(x_med) < 3:
+            results.append({"slot": slot, "slope": 0.0, "r2": 0.0,
+                            "p95": np.percentile(y, 95),
+                            "n_used": len(x)})
+            continue
+
+        slope, _, r_val, _, _ = scipy.stats.linregress(x_med, y_med)
+        results.append({
+            "slot": slot,
+            "slope": slope,
+            "r2": r_val ** 2,
+            "p95": np.percentile(y, 95),
+            "n_used": len(x),
+        })
+
+    return pd.DataFrame(results)
+
+
 if __name__ == "__main__":
     # Test rápido
     datos_comp = pd.read_csv(centralidad_path("N505"))
     datos_obs = pd.read_csv(
         "data/processed/combinaciones/traffic_mean_N505_r1s6.csv"
     )
-    
+
     slopes, per95, r2s = correlate_stepwise(datos_comp, datos_obs, "DiCC")
     print(f"Slopes: mean={np.mean(slopes):.4f}, std={np.std(slopes):.4f}")
     print(f"P95: mean={np.mean(per95):.4f}")
