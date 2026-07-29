@@ -11,13 +11,6 @@ This repository implements the full pipeline described in:
 
 > E. Guerra, *How the traffic congestion is induced by the complex street network of the city*, SSRN. https://ssrn.com/abstract=XXXXXXXX
 
-*(full link to be added)*
-
-The study combines two complementary representations of the urban road network
-with traffic data extracted directly from Google Maps images, and tests whether
-the computational/structural properties of the network are correlated with, and
-potentially predictive of, real traffic conditions.
-
 ---
 
 ## Overview
@@ -28,96 +21,94 @@ The project follows a five-stage pipeline:
 2. **Digitize** the road network manually into two graph models.
 3. **Extract** a per-street traffic value (mean / max) from each image.
 4. **Compute** network metrics (centrality, adjacency, random-walk dynamics).
-5. **Visualize & correlate** network metrics against measured traffic intensity.
-
-All stages are reproducible from the scripts in `src/` plus helper notebooks in
-`notebooks/`.
+5. **Correlate** network metrics against measured traffic intensity.
 
 ---
 
 ## The Two Network Models
 
-The road network is represented at two levels of detail:
-
-| Model        | Nodes | Description                                                                 |
-|--------------|-------|-----------------------------------------------------------------------------|
-| **N505** (SimpleNet)  | 505   | Only intersections are nodes. Straight links between intersections.         |
-| **N1207** (ComplexNet)| 1207  | Intersections **plus** intermediate nodes, capturing curved / non-straight streets. |
-
-The richer N1207 model is required to obtain meaningful data for streets that
-are not straight lines, while N505 provides the simpler intersection-only view.
+| Model | Nodes | Description |
+|-------|-------|-------------|
+| **N505** (SimpleNet) | 505 | Only intersections are nodes. Straight links between intersections. |
+| **N1207** (ComplexNet) | 1207 | Intersections **plus** intermediate nodes, capturing curved / non-straight streets. |
 
 ---
 
-## Methodology / Pipeline
+## Pipeline
 
 ### 1. Capture traffic images — `src/capture/`
-Downloads Google Maps traffic screenshots for a bounding box of Punta Arenas
-using Selenium (`screenshot_taker.py`, `map_generator.py`).
+
+Downloads Google Maps traffic screenshots using Selenium.
 
 ```bash
-python -m src.capture.screenshot_taker   # adjust config in src/capture/config.py
+python -m src.capture.screenshot_taker
 ```
 
 ### 2. Manual network digitization — `src/manual_network/NetworkCreator.py`
-An interactive Pygame tool to draw nodes (intersections) and links (streets)
-directly over a reference image. Outputs the `.dat` files:
-`Posiciones.dat`, `Conexiones.dat`, `Carriles.dat`.
+
+Interactive Pygame tool to draw nodes and links over a reference image.
 
 ```bash
 python -m src.manual_network.NetworkCreator
 ```
-- Use **N** to create nodes, **L** to create links, **Ctrl+S** to save, **Ctrl+Z** to undo.
-- Two networks are produced: `PuntaArenas` (N505) and `PuntaArenasDetallado` (N1207).
 
-### 3. Traffic extraction — `src/image_analysis/GetDataFromImages.py`
-Converts each traffic image into a numeric matrix (green/orange/red/dark-red →
-traffic levels 64/128/191/255) and samples it along each street. For every
-street it returns the **mean** and **max** traffic value, configurable by:
+Outputs: `data/network/dat_files/{PuntaArenas,PuntaArenasDetallado}/`
 
-- `steps` — number of intermediate sample points between street endpoints.
-- `radio` — sampling radius (in pixels) around each point.
+### 3. Build and serialize network — `src/network/build_all_networks.py`
+
+Reads `.dat` files, builds networkx graphs, computes centrality metrics, and serializes everything to `network_graphs.pkl`.
 
 ```bash
-python -m src.image_analysis.GetDataFromImages
-# → data/processed/traffic_mean.csv, data/processed/traffic_max.csv
+python -m src.network.build_all_networks
 ```
 
-### 4. Batch combinations — `generar_combinaciones.py`
-Runs the extraction for both networks across all combinations of
-`radio ∈ {0,1,2,3}` and `steps ∈ {2,5,9}` (labelled `r*s*`, e.g. `r1s6`).
-Already-computed combinations are skipped.
+Outputs: `data/network/serialized/{N505,N1207}/`
+
+### 4. Extract traffic from images — `src/image_analysis/extract_traffic.py`
+
+Converts each traffic image into a numeric matrix (green/orange/red/dark-red → 64/128/191/255) and samples it along each street.
+
+**Parameters:**
+- `steps` — intermediate sample points between street endpoints (2, 5, 9)
+- `radio` — sampling radius in pixels (0, 1, 2, 3)
+- `weekdays_only` — filter to exclude weekends
+
+```python
+from src.image_analysis.extract_traffic import run_step5
+run_step5(red='N505', radio=1, steps=5, weekdays_only=True)
+```
+
+### 5. Batch combinations — `generar_combinaciones.py`
+
+Runs extraction for both networks across all 24 combinations (2 redes × 4 radios × 3 steps).
 
 ```bash
 python generar_combinaciones.py
-# → data/processed/combinaciones/traffic_{mean,max}_{N505,N1207}_r*s*.csv
-# (estimated 3–5 h depending on hardware)
 ```
 
-### 5. Network metrics — `src/network/GetDataFromNetwork.py`
-Builds directed/undirected `networkx` graphs (nodes-as-intersections and
-nodes-as-streets) and computes:
+Outputs: `data/processed/combinaciones/traffic_{mean,max}_N{505,1207}_r{0-3}s{3,6,10}.csv`
 
-- Degree, closeness and betweenness centrality (BC/CC/DC) for directed & undirected graphs.
-- Adjacency matrices (intersections & streets).
-- Analytic random-walk probabilities and Ehrenfest-urn dynamics.
+**Note:** Each combination takes ~15-20 min. Full batch: ~6-8 hours.
+
+### 6. Compute centrality — `src/network/compute_centrality.py`
+
+Computes 6 centrality metrics on the streets graph:
+- BC, DiBC (Betweenness)
+- CC, DiCC (Closeness)
+- DC, DiDC (Degree)
 
 ```bash
-python -m src.network.GetDataFromNetwork
-# → data/processed/DataNetwork/centrality_for_models/*.dat, adjacency matrices
+python -m src.network.compute_centrality
 ```
 
-### 6. Visualization & correlation — `src/visualization/` + `notebooks/`
-Plots relating network metrics to traffic intensity, plus slope/percentile
-analyses. The notebooks document results for a single configuration each:
+Outputs: `data/network/serialized/{N505,N1207}/centrality/indices_centralidad.csv`
 
-| Notebook | Purpose |
-|----------|---------|
-| `01_CreacionRed.ipynb`        | Network creation walkthrough |
-| `02_CapturaDatos.ipynb`       | Data capture walkthrough |
-| `03_Procesamiento.ipynb`      | Image → traffic processing |
-| `04_FigurasResultados.ipynb`  | Result figures |
-| `05_ExploradorFigurasPaper.ipynb` | Paper figure explorer |
+### 7. Correlate traffic with centrality — `src/analysis/correlate.py`
+
+```python
+from src.analysis.correlate import correlate_with_aggregated
+df = correlate_with_aggregated('N505', radio=1, steps=5, traffic_type='mean')
+```
 
 ---
 
@@ -126,101 +117,139 @@ analyses. The notebooks document results for a single configuration each:
 ```
 FinalVersion/
 ├── src/
-│   ├── capture/            # Google Maps traffic image download (Selenium)
-│   ├── manual_network/     # Interactive network digitizer (NetworkCreator.py)
-│   ├── image_analysis/     # Traffic value extraction (GetDataFromImages.py)
-│   ├── network/            # Network metrics (GetDataFromNetwork.py)
-│   ├── visualization/      # Correlation & result plots
-│   ├── utils/              # Shared helpers
-│   └── run_capture.py
-├── notebooks/             # 01–05 walkthrough notebooks + results/figures
+│   ├── capture/              # Google Maps screenshot download
+│   ├── manual_network/       # Interactive network digitizer
+│   ├── image_analysis/       # Traffic extraction from images
+│   │   ├── extract_traffic.py    # Main extraction module
+│   │   └── aggregate_traffic.py  # Post-processing (stats_*)
+│   ├── network/              # Network building and centrality
+│   │   ├── build_all_networks.py # Build + serialize networks
+│   │   ├── compute_centrality.py # Compute centrality metrics
+│   │   └── load_network.py       # Load serialized networks
+│   ├── analysis/             # Correlation and threshold analysis
+│   │   ├── correlate.py      # Traffic-centrality correlation
+│   │   ├── threshold.py      # Threshold sweep
+│   │   └── sweep.py          # Full parameter sweep
+│   ├── visualization/        # Result plots
+│   └── utils/                # Shared helpers
+│       ├── paths.py          # Centralized path resolution
+│       └── basics.py         # Utility functions
 ├── data/
-│   ├── raw/               # Reference images (NOT versioned)
-│   ├── network/dat_files/ # Hand-built .dat networks (versioned)
-│   └── processed/         # Traffic CSVs, centrality, combinations
-├── results/               # Generated figures
-├── generar_combinaciones.py
+│   ├── raw/                  # Traffic screenshots (PNG)
+│   ├── network/
+│   │   ├── dat_files/        # Original .dat network files
+│   │   └── serialized/       # Serialized networks + centrality
+│   │       ├── N505/
+│   │       │   ├── network_graphs.pkl
+│   │       │   └── centrality/indices_centralidad.csv
+│   │       └── N1207/
+│   └── processed/
+│       └── combinaciones/    # Traffic CSVs (mean/max + stats_*)
+├── results/                  # Generated figures
+├── config/pipeline.yaml      # Central configuration
+├── generar_combinaciones.py  # Batch traffic extraction
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Installation
+## Data Files
 
-Requires Python 3.9+.
+### Traffic CSVs (`data/processed/combinaciones/`)
+
+| Pattern | Description | Rows | Columns |
+|---------|-------------|------|---------|
+| `traffic_mean_N*_r*s*.csv` | Mean traffic per street | 505/1207 | 2318 (3 + 2315 instants) |
+| `traffic_max_N*_r*s*.csv` | Max traffic per street | 505/1207 | 2318 |
+| `traffic_stats_*` | Statistical aggregations | 505/1207 | varies |
+
+**Column naming:** `r{radio}s{steps+1}` (e.g., `r1s6` = radio=1, steps=5, S=6)
+
+### Centrality CSVs (`data/network/serialized/*/centrality/`)
+
+| Column | Description |
+|--------|-------------|
+| `Nodo` | Node ID |
+| `Conections` | Tuple of connected nodes |
+| `BC`, `DiBC` | Betweenness centrality (undirected/directed) |
+| `CC`, `DiCC` | Closeness centrality (undirected/directed) |
+| `DC`, `DiDC` | Degree centrality (undirected/directed) |
+
+---
+
+## Installation
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .  # For package imports
 ```
-
-### ⚠️ API key — security note
-
-`src/capture/config.py` currently contains a hard-coded Google Maps API key.
-**Do not commit secrets.** Move it to an environment variable and read it from
-the configuration instead:
-
-```bash
-export GOOGLE_MAPS_API_KEY="your_key_here"
-```
-
-Then update `src/capture/config.py` to use `os.environ["GOOGLE_MAPS_API_KEY"]`
-before sharing the repository or publishing it.
 
 ---
 
-## Data
+## Configuration
 
-- **Raw traffic images** (`data/raw/Images/...`): **not included** in the
-  repository (too large). Request them separately and place them under
-  `data/raw/Images/screenshotsGoogleMaps/screenshots/`.
-- **Network `.dat` files** (`data/network/dat_files/`): versioned in the repo.
-- **Processed outputs** (`data/processed/`, `results/`): generated by the pipeline.
+All paths and parameters are centralized in `config/pipeline.yaml`:
 
----
+```yaml
+redes:
+  N505:
+    nodos: 505
+    network_data: "data/network/dat_files/PuntaArenas"
+  N1207:
+    nodos: 1207
+    network_data: "data/network/dat_files/PuntaArenasDetallado"
 
-## Usage / Reproduction
+combinaciones:
+  radios: [0, 1, 2, 3]
+  steps: [2, 5, 9]
 
-Run stages in order; each depends on the previous outputs:
-
-```bash
-# 1. Capture images (needs API key + Selenium driver)
-python -m src.capture.screenshot_taker
-
-# 2. Digitize network (interactive) → data/network/dat_files/
-python -m src.manual_network.NetworkCreator
-
-# 3. Extract traffic for all combinations
-python generar_combinaciones.py
-
-# 4. Compute network metrics
-python -m src.network.GetDataFromNetwork
-
-# 5. Explore / reproduce figures
-jupyter notebook notebooks/04_FigurasResultados.ipynb
+imagenes:
+  dir: "data/raw"
+  referencia: "CleanScreenshot.png"
+  solo_dias_semana: true
 ```
 
-The notebooks are the recommended entry point for understanding the results of a
-single configuration, while the scripts reproduce the full batch of combinations.
-
 ---
 
-## Results / Outputs
+## Key Functions
 
-- Traffic tables: `data/processed/traffic_{mean,max}*.csv`
-- Centrality & coordinates: `data/processed/DataNetwork/`
-- Adjacency matrices: `data/RepValdi/*_adjacency_matrix.txt`
-- Figures: `results/`, `notebooks/results/figures/`
+### `src/utils/paths.py`
+
+```python
+from src.utils.paths import centralidad_path, combinaciones_path, iter_redes
+
+centralidad_path('N505')  # → .../serialized/N505/centrality/indices_centralidad.csv
+combinaciones_path('mean', 'N505', 1, 5)  # → .../combinaciones/traffic_mean_N505_r1s6.csv
+iter_redes()  # → ['N505', 'N1207']
+```
+
+### `src/analysis/correlate.py`
+
+```python
+from src.analysis.correlate import correlate_with_aggregated
+
+# Correlate centrality with aggregated traffic
+df = correlate_with_aggregated('N505', radio=1, steps=5, traffic_type='mean')
+
+# Correlate specific centrality metric
+df = correlate_stepwise('N505', 'DC', radio=1, steps=5)
+```
 
 ---
 
 ## Project Status
 
-Functional end-to-end pipeline. The execution order is flexible: the scripts
-regenerate all images and results, and the notebooks document the outcome for a
-single network/configuration at a time.
+- [x] Network serialization
+- [x] Centrality computation (6 metrics × 2 networks)
+- [x] Traffic extraction (24 combinations × 2 networks)
+- [x] Weekday filtering
+- [x] Basic correlation analysis
+- [ ] Statistical aggregation (traffic_stats_*)
+- [ ] Threshold optimization
+- [ ] Full parameter sweep
 
 ---
 
