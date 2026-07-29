@@ -3,54 +3,41 @@ generar_combinaciones.py
 Genera todos los CSVs de tráfico para N505 y N1207 con distintas combinaciones
 de radio y steps. Ejecutar desde FinalVersion/ con el .venv activado.
 
+Usa la versión nueva de ImageProcessor (src.image_analysis.extract_traffic)
+que lee desde la serialización de la red vial.
+
 Tiempo estimado: ~3-5 horas dependiendo del hardware.
 """
 
-import sys
-import os
 import time
 
-sys.path.insert(0, 'src/image_analysis')
-from GetDataFromImages import ImageProcessor
+from src.image_analysis.extract_traffic import ImageProcessor, TrafficConfig
+from src.utils.paths import combinaciones_path, iter_redes, combinaciones_dir
 
 # ------------------------------------------------------------------
 # Configuración
 # ------------------------------------------------------------------
 
-REDES = {
-    'N505': {
-        'screenshots':  'data/raw/Images/screenshotsGoogleMaps/screenshots',
-        'network_data': 'data/network/dat_files/PuntaArenas',
-    },
-    'N1207': {
-        'screenshots':  'data/raw/Images/screenshotsGoogleMaps/screenshots',
-        'network_data': 'data/network/dat_files/PuntaArenasDetallado',
-    },
-}
-
 COMBINACIONES = [
-    (0, 2),   # r0s3
-    (0, 5),   # r0s6
-    (0, 9),   # r0s10
-    (1, 2),   # r1s3  ← paper N1207
-    (1, 5),   # r1s6  ← paper N505
-    (1, 9),   # r1s10
-    (2, 2),   # r2s3
-    (2, 5),   # r2s6
-    (2, 9),   # r2s10
-    (3, 2),   # r3s3
-    (3, 5),   # r3s6
-    (3, 9),   # r3s10
+    (0, 2),   # r0s2
+    (0, 5),   # r0s5
+    (0, 9),   # r0s9
+    (1, 2),   # r1s2  ← paper N1207
+    (1, 5),   # r1s5  ← paper N505
+    (1, 9),   # r1s9
+    (2, 2),   # r2s2
+    (2, 5),   # r2s5
+    (2, 9),   # r2s9
+    (3, 2),   # r3s2
+    (3, 5),   # r3s5
+    (3, 9),   # r3s9
 ]
-
-OUTPUT_DIR = 'data/processed/combinaciones'
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ------------------------------------------------------------------
 # Log
 # ------------------------------------------------------------------
 
-LOG_FILE = os.path.join(OUTPUT_DIR, 'progreso.log')
+LOG_FILE = combinaciones_dir() / 'progreso.log'
 
 def log(msg):
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -63,34 +50,32 @@ def log(msg):
 # Calcular total y verificar cuáles ya existen
 # ------------------------------------------------------------------
 
-total = len(REDES) * len(COMBINACIONES)
+redes = iter_redes()
+total = len(redes) * len(COMBINACIONES)
 completados = 0
 saltados = 0
 
 log(f"=== Inicio: {total} combinaciones a generar ===")
-log(f"Resultados en: {OUTPUT_DIR}/")
+log(f"Usando nueva versión de ImageProcessor (serialización)")
 
 # ------------------------------------------------------------------
 # Loop principal
 # ------------------------------------------------------------------
 
-for red_nombre, red_config in REDES.items():
+for red_nombre in redes:
     log(f"\n--- Red: {red_nombre} ---")
 
-    processor = ImageProcessor(
-        path_dir_screenshots  = red_config['screenshots'],
-        path_dir_network_data = red_config['network_data'],
-    )
+    processor = ImageProcessor(red_nombre)
 
     for radio, steps in COMBINACIONES:
         s_label = steps + 1  # steps=2 → S=3, steps=5 → S=6, etc.
         nombre = f"r{radio}s{s_label}"
 
-        path_mean = os.path.join(OUTPUT_DIR, f"traffic_mean_{red_nombre}_{nombre}.csv")
-        path_max  = os.path.join(OUTPUT_DIR, f"traffic_max_{red_nombre}_{nombre}.csv")
+        mean_path = combinaciones_path('mean', red_nombre, radio, steps)
+        max_path = combinaciones_path('max', red_nombre, radio, steps)
 
         # Saltar si ya existe
-        if os.path.exists(path_mean) and os.path.exists(path_max):
+        if mean_path.exists() and max_path.exists():
             log(f"  [SKIP] {red_nombre} {nombre} — ya existe")
             saltados += 1
             completados += 1
@@ -100,9 +85,12 @@ for red_nombre, red_config in REDES.items():
         t0 = time.time()
 
         try:
-            df_mean, df_max = processor.images_to_dataframe(steps=steps, radio=radio)
-            df_mean.to_csv(path_mean, index=False)
-            df_max.to_csv(path_max,   index=False)
+            config = TrafficConfig(radio=radio, steps=steps, weekdays_only=True)
+            df_mean, df_max = processor.process_combination(config)
+
+            mean_path.parent.mkdir(parents=True, exist_ok=True)
+            df_mean.to_csv(mean_path, index=False)
+            df_max.to_csv(max_path, index=False)
 
             elapsed = time.time() - t0
             completados += 1
@@ -112,4 +100,4 @@ for red_nombre, red_config in REDES.items():
             log(f"  [ERROR] {red_nombre} {nombre} — {e}")
 
 log(f"\n=== Fin: {completados}/{total} completados ({saltados} saltados) ===")
-log(f"Archivos en: {OUTPUT_DIR}/")
+log(f"Archivos en: {combinaciones_dir()}/")

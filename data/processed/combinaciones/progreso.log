@@ -55,3 +55,263 @@
 [2026-07-17 05:35:08] 
 === Fin: 24/24 completados (0 saltados) ===
 [2026-07-17 05:35:08] Archivos en: data/processed/combinaciones/
+[2026-07-28 23:08:56] === Inicio: 24 combinaciones a generar ===
+[2026-07-28 23:08:56] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-28 23:08:56] 
+--- Red: N505 ---
+[2026-07-28 23:08:56]   [SKIP] N505 r0s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r0s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r0s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r1s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r1s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r1s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r2s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r2s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r2s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r3s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r3s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N505 r3s10 — ya existe
+[2026-07-28 23:08:56] 
+--- Red: N1207 ---
+[2026-07-28 23:08:56]   [SKIP] N1207 r0s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r0s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r0s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r1s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r1s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r1s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r2s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r2s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r2s10 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r3s3 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r3s6 — ya existe
+[2026-07-28 23:08:56]   [SKIP] N1207 r3s10 — ya existe
+[2026-07-28 23:08:56] 
+=== Fin: 24/24 completados (24 saltados) ===
+[2026-07-28 23:08:56] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
+[2026-07-28 23:09:57] === Inicio: 24 combinaciones a generar ===
+[2026-07-28 23:09:57] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-28 23:09:57] 
+--- Red: N505 ---
+[2026-07-28 23:09:57]   [START] N505 r0s3 (radio=0, steps=2, S=3)
+[2026-07-28 23:11:42] === Inicio: 24 combinaciones a generar ===
+[2026-07-28 23:11:42] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-28 23:11:42] 
+--- Red: N505 ---
+[2026-07-28 23:11:42]   [START] N505 r0s3 (radio=0, steps=2, S=3)
+[2026-07-28 23:14:19] === Inicio: 24 combinaciones a generar ===
+[2026-07-28 23:14:19] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-28 23:14:19] 
+--- Red: N505 ---
+[2026-07-28 23:14:19]   [START] N505 r0s3 (radio=0, steps=2, S=3)
+[2026-07-28 23:23:11]   [OK] N505 r0s3 — (505, 2318) — 8.9 min
+[2026-07-28 23:23:11]   [START] N505 r0s6 (radio=0, steps=5, S=6)
+[2026-07-28 23:32:03]   [OK] N505 r0s6 — (505, 2318) — 8.9 min
+[2026-07-28 23:32:03]   [START] N505 r0s10 (radio=0, steps=9, S=10)
+[2026-07-28 23:40:59]   [OK] N505 r0s10 — (505, 2318) — 8.9 min
+[2026-07-28 23:40:59]   [START] N505 r1s3 (radio=1, steps=2, S=3)
+[2026-07-28 23:50:03]   [OK] N505 r1s3 — (505, 2318) — 9.1 min
+[2026-07-28 23:50:03]   [START] N505 r1s6 (radio=1, steps=5, S=6)
+[2026-07-28 23:59:25]   [OK] N505 r1s6 — (505, 2318) — 9.4 min
+[2026-07-28 23:59:25]   [START] N505 r1s10 (radio=1, steps=9, S=10)
+[2026-07-29 00:09:43]   [OK] N505 r1s10 — (505, 2318) — 10.3 min
+[2026-07-29 00:09:43]   [START] N505 r2s3 (radio=2, steps=2, S=3)
+[2026-07-29 00:19:13]   [OK] N505 r2s3 — (505, 2318) — 9.5 min
+[2026-07-29 00:19:13]   [START] N505 r2s6 (radio=2, steps=5, S=6)
+[2026-07-29 00:29:14]   [OK] N505 r2s6 — (505, 2318) — 10.0 min
+[2026-07-29 00:29:14]   [START] N505 r2s10 (radio=2, steps=9, S=10)
+[2026-07-29 00:39:59]   [OK] N505 r2s10 — (505, 2318) — 10.8 min
+[2026-07-29 00:39:59]   [START] N505 r3s3 (radio=3, steps=2, S=3)
+[2026-07-29 00:50:06]   [OK] N505 r3s3 — (505, 2318) — 10.1 min
+[2026-07-29 00:50:06]   [START] N505 r3s6 (radio=3, steps=5, S=6)
+[2026-07-29 01:01:11]   [OK] N505 r3s6 — (505, 2318) — 11.1 min
+[2026-07-29 01:01:11]   [START] N505 r3s10 (radio=3, steps=9, S=10)
+[2026-07-29 01:13:35]   [OK] N505 r3s10 — (505, 2318) — 12.4 min
+[2026-07-29 01:13:35] 
+--- Red: N1207 ---
+[2026-07-29 01:13:36]   [START] N1207 r0s3 (radio=0, steps=2, S=3)
+[2026-07-29 01:22:36]   [OK] N1207 r0s3 — (1207, 2318) — 9.0 min
+[2026-07-29 01:22:36]   [START] N1207 r0s6 (radio=0, steps=5, S=6)
+[2026-07-29 01:31:43]   [OK] N1207 r0s6 — (1207, 2318) — 9.1 min
+[2026-07-29 01:31:43]   [START] N1207 r0s10 (radio=0, steps=9, S=10)
+[2026-07-29 01:40:56]   [OK] N1207 r0s10 — (1207, 2318) — 9.2 min
+[2026-07-29 01:40:56]   [START] N1207 r1s3 (radio=1, steps=2, S=3)
+[2026-07-29 01:50:35]   [OK] N1207 r1s3 — (1207, 2318) — 9.6 min
+[2026-07-29 01:50:35]   [START] N1207 r1s6 (radio=1, steps=5, S=6)
+[2026-07-29 02:00:44]   [OK] N1207 r1s6 — (1207, 2318) — 10.2 min
+[2026-07-29 02:00:44]   [START] N1207 r1s10 (radio=1, steps=9, S=10)
+[2026-07-29 02:11:39]   [OK] N1207 r1s10 — (1207, 2318) — 10.9 min
+[2026-07-29 02:11:39]   [START] N1207 r2s3 (radio=2, steps=2, S=3)
+[2026-07-29 02:22:17]   [OK] N1207 r2s3 — (1207, 2318) — 10.6 min
+[2026-07-29 02:22:17]   [START] N1207 r2s6 (radio=2, steps=5, S=6)
+[2026-07-29 02:34:14]   [OK] N1207 r2s6 — (1207, 2318) — 11.9 min
+[2026-07-29 02:34:14]   [START] N1207 r2s10 (radio=2, steps=9, S=10)
+[2026-07-29 02:47:53]   [OK] N1207 r2s10 — (1207, 2318) — 13.7 min
+[2026-07-29 02:47:53]   [START] N1207 r3s3 (radio=3, steps=2, S=3)
+[2026-07-29 02:59:57]   [OK] N1207 r3s3 — (1207, 2318) — 12.1 min
+[2026-07-29 02:59:57]   [START] N1207 r3s6 (radio=3, steps=5, S=6)
+[2026-07-29 03:14:23]   [OK] N1207 r3s6 — (1207, 2318) — 14.4 min
+[2026-07-29 03:14:23]   [START] N1207 r3s10 (radio=3, steps=9, S=10)
+[2026-07-29 03:31:58]   [OK] N1207 r3s10 — (1207, 2318) — 17.6 min
+[2026-07-29 03:31:58] 
+=== Fin: 24/24 completados (0 saltados) ===
+[2026-07-29 03:31:58] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
+[2026-07-28 23:14:19] === Inicio: 24 combinaciones a generar ===
+[2026-07-28 23:14:19] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-28 23:14:19] 
+--- Red: N505 ---
+  N505: 505 calles, 2315 instantes
+[2026-07-28 23:14:19]   [START] N505 r0s3 (radio=0, steps=2, S=3)
+[2026-07-28 23:23:11]   [OK] N505 r0s3 — (505, 2318) — 8.9 min
+[2026-07-28 23:23:11]   [START] N505 r0s6 (radio=0, steps=5, S=6)
+[2026-07-28 23:32:03]   [OK] N505 r0s6 — (505, 2318) — 8.9 min
+[2026-07-28 23:32:03]   [START] N505 r0s10 (radio=0, steps=9, S=10)
+[2026-07-28 23:40:59]   [OK] N505 r0s10 — (505, 2318) — 8.9 min
+[2026-07-28 23:40:59]   [START] N505 r1s3 (radio=1, steps=2, S=3)
+[2026-07-28 23:50:03]   [OK] N505 r1s3 — (505, 2318) — 9.1 min
+[2026-07-28 23:50:03]   [START] N505 r1s6 (radio=1, steps=5, S=6)
+[2026-07-28 23:59:25]   [OK] N505 r1s6 — (505, 2318) — 9.4 min
+[2026-07-28 23:59:25]   [START] N505 r1s10 (radio=1, steps=9, S=10)
+[2026-07-29 00:09:43]   [OK] N505 r1s10 — (505, 2318) — 10.3 min
+[2026-07-29 00:09:43]   [START] N505 r2s3 (radio=2, steps=2, S=3)
+[2026-07-29 00:19:13]   [OK] N505 r2s3 — (505, 2318) — 9.5 min
+[2026-07-29 00:19:13]   [START] N505 r2s6 (radio=2, steps=5, S=6)
+[2026-07-29 00:29:14]   [OK] N505 r2s6 — (505, 2318) — 10.0 min
+[2026-07-29 00:29:14]   [START] N505 r2s10 (radio=2, steps=9, S=10)
+[2026-07-29 00:39:59]   [OK] N505 r2s10 — (505, 2318) — 10.8 min
+[2026-07-29 00:39:59]   [START] N505 r3s3 (radio=3, steps=2, S=3)
+[2026-07-29 00:50:06]   [OK] N505 r3s3 — (505, 2318) — 10.1 min
+[2026-07-29 00:50:06]   [START] N505 r3s6 (radio=3, steps=5, S=6)
+[2026-07-29 01:01:11]   [OK] N505 r3s6 — (505, 2318) — 11.1 min
+[2026-07-29 01:01:11]   [START] N505 r3s10 (radio=3, steps=9, S=10)
+[2026-07-29 01:13:35]   [OK] N505 r3s10 — (505, 2318) — 12.4 min
+[2026-07-29 01:13:35] 
+--- Red: N1207 ---
+  N1207: 1207 calles, 2315 instantes
+[2026-07-29 01:13:36]   [START] N1207 r0s3 (radio=0, steps=2, S=3)
+[2026-07-29 01:22:36]   [OK] N1207 r0s3 — (1207, 2318) — 9.0 min
+[2026-07-29 01:22:36]   [START] N1207 r0s6 (radio=0, steps=5, S=6)
+[2026-07-29 01:31:43]   [OK] N1207 r0s6 — (1207, 2318) — 9.1 min
+[2026-07-29 01:31:43]   [START] N1207 r0s10 (radio=0, steps=9, S=10)
+[2026-07-29 01:40:56]   [OK] N1207 r0s10 — (1207, 2318) — 9.2 min
+[2026-07-29 01:40:56]   [START] N1207 r1s3 (radio=1, steps=2, S=3)
+[2026-07-29 01:50:35]   [OK] N1207 r1s3 — (1207, 2318) — 9.6 min
+[2026-07-29 01:50:35]   [START] N1207 r1s6 (radio=1, steps=5, S=6)
+[2026-07-29 02:00:44]   [OK] N1207 r1s6 — (1207, 2318) — 10.2 min
+[2026-07-29 02:00:44]   [START] N1207 r1s10 (radio=1, steps=9, S=10)
+[2026-07-29 02:11:39]   [OK] N1207 r1s10 — (1207, 2318) — 10.9 min
+[2026-07-29 02:11:39]   [START] N1207 r2s3 (radio=2, steps=2, S=3)
+[2026-07-29 02:22:17]   [OK] N1207 r2s3 — (1207, 2318) — 10.6 min
+[2026-07-29 02:22:17]   [START] N1207 r2s6 (radio=2, steps=5, S=6)
+[2026-07-29 02:34:14]   [OK] N1207 r2s6 — (1207, 2318) — 11.9 min
+[2026-07-29 02:34:14]   [START] N1207 r2s10 (radio=2, steps=9, S=10)
+[2026-07-29 02:47:53]   [OK] N1207 r2s10 — (1207, 2318) — 13.7 min
+[2026-07-29 02:47:53]   [START] N1207 r3s3 (radio=3, steps=2, S=3)
+[2026-07-29 02:59:57]   [OK] N1207 r3s3 — (1207, 2318) — 12.1 min
+[2026-07-29 02:59:57]   [START] N1207 r3s6 (radio=3, steps=5, S=6)
+[2026-07-29 03:14:23]   [OK] N1207 r3s6 — (1207, 2318) — 14.4 min
+[2026-07-29 03:14:23]   [START] N1207 r3s10 (radio=3, steps=9, S=10)
+[2026-07-29 03:31:58]   [OK] N1207 r3s10 — (1207, 2318) — 17.6 min
+[2026-07-29 03:31:58] 
+=== Fin: 24/24 completados (0 saltados) ===
+[2026-07-29 03:31:58] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
+[2026-07-29 03:32:40] === Inicio: 24 combinaciones a generar ===
+[2026-07-29 03:32:40] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-29 03:32:40] 
+--- Red: N505 ---
+[2026-07-29 03:32:40]   [SKIP] N505 r0s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r0s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r0s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s10 — ya existe
+[2026-07-29 03:32:40] 
+--- Red: N1207 ---
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s10 — ya existe
+[2026-07-29 03:32:40] 
+=== Fin: 24/24 completados (24 saltados) ===
+[2026-07-29 03:32:40] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
+[2026-07-29 03:32:40] === Inicio: 24 combinaciones a generar ===
+[2026-07-29 03:32:40] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-29 03:32:40] 
+--- Red: N505 ---
+  N505: 505 calles, 2315 instantes
+[2026-07-29 03:32:40]   [SKIP] N505 r0s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r0s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r0s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r1s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r2s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N505 r3s10 — ya existe
+[2026-07-29 03:32:40] 
+--- Red: N1207 ---
+  N1207: 1207 calles, 2315 instantes
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r0s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r1s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r2s10 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s3 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s6 — ya existe
+[2026-07-29 03:32:40]   [SKIP] N1207 r3s10 — ya existe
+[2026-07-29 03:32:40] 
+=== Fin: 24/24 completados (24 saltados) ===
+[2026-07-29 03:32:40] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
+[2026-07-29 03:32:51] === Inicio: 24 combinaciones a generar ===
+[2026-07-29 03:32:51] Usando nueva versión de ImageProcessor (serialización)
+[2026-07-29 03:32:51] 
+--- Red: N505 ---
+[2026-07-29 03:32:51]   [SKIP] N505 r0s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r0s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r0s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r1s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r1s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r1s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r2s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r2s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r2s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r3s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r3s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N505 r3s10 — ya existe
+[2026-07-29 03:32:51] 
+--- Red: N1207 ---
+[2026-07-29 03:32:51]   [SKIP] N1207 r0s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r0s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r0s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r1s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r1s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r1s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r2s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r2s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r2s10 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r3s3 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r3s6 — ya existe
+[2026-07-29 03:32:51]   [SKIP] N1207 r3s10 — ya existe
+[2026-07-29 03:32:51] 
+=== Fin: 24/24 completados (24 saltados) ===
+[2026-07-29 03:32:51] Archivos en: /home/chuleo/Documentos/Trabajo/2025/PhD/2024_Traffic_Tesis/TransportePuntaArenas2023/FinalVersion/data/processed/combinaciones/
