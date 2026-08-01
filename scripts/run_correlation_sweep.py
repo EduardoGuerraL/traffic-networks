@@ -10,14 +10,13 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from src.utils.paths import (
-    centralidad_path, combinaciones_dir, iter_redes, iter_radios,
+    centralidad_path, traffic_stats_dir, iter_redes, iter_radios,
     iter_steps, iter_topologia,
 )
 from src.analysis.correlate import correlate_with_aggregated, SLOT_COLUMNS
 
 
 STATS_TYPES = ["mean", "median", "std", "iqr"]
-FILTERS = ["weekdays", "allweek"]
 
 
 def build_output_path(
@@ -37,7 +36,6 @@ def run_single_combination(
     steps: int,
     stat_type: str = "mean",
     traffic_stat: str = "mean",
-    filter_suffix: str = "weekdays",
     topologias: list[str] | None = None,
     n_boxes: int | None = None,
 ) -> pd.DataFrame:
@@ -47,9 +45,9 @@ def run_single_combination(
     Returns:
         DataFrame con columnas: topology, slot, slope, r2, p95, n_used
     """
-    cdir = combinaciones_dir()
+    cdir = traffic_stats_dir()
     s_label = steps + 1
-    fname = f"traffic_stats_{stat_type}_{traffic_stat}_{red}_r{radio}s{s_label}_{filter_suffix}.csv"
+    fname = f"traffic_stats_{stat_type}_{traffic_stat}_{red}_r{radio}s{s_label}.csv"
     traffic_path = cdir / fname
 
     if not traffic_path.exists():
@@ -86,8 +84,6 @@ def main():
                         help="Tipo de estadística de tráfico (default: mean)")
     parser.add_argument("--traffic-stat", choices=["mean", "max"], default="mean",
                         help="Estadística de tráfico original (default: mean)")
-    parser.add_argument("--filter", choices=FILTERS, default="weekdays",
-                        help="Filtro temporal (default: weekdays)")
     parser.add_argument("-o", "--output", default="results/correlation_aggregated.csv",
                         help="CSV de salida")
     args = parser.parse_args()
@@ -118,7 +114,6 @@ def main():
                     df_comp, red, radio, steps,
                     stat_type=args.stat_type,
                     traffic_stat=args.traffic_stat,
-                    filter_suffix=args.filter,
                     topologias=topologias,
                 )
 

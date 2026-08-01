@@ -144,7 +144,8 @@ FinalVersion/
 │   │       │   └── centrality/indices_centralidad.csv
 │   │       └── N1207/
 │   └── processed/
-│       └── combinaciones/    # Traffic CSVs (mean/max + stats_*)
+│       ├── combinaciones/    # Traffic CSVs (mean/max)
+│       └── traffic_stats/    # Aggregated stats (mean/std/median/iqr per slot)
 ├── results/                  # Generated figures
 ├── config/pipeline.yaml      # Central configuration
 ├── generar_combinaciones.py  # Batch traffic extraction
@@ -162,7 +163,16 @@ FinalVersion/
 |---------|-------------|------|---------|
 | `traffic_mean_N*_r*s*.csv` | Mean traffic per street | 505/1207 | 2318 (3 + 2315 instants) |
 | `traffic_max_N*_r*s*.csv` | Max traffic per street | 505/1207 | 2318 |
-| `traffic_stats_*` | Statistical aggregations | 505/1207 | varies |
+
+### Traffic Stats (`data/processed/traffic_stats/`)
+
+| Pattern | Description | Rows | Columns |
+|---------|-------------|------|---------|
+| `traffic_stats_mean_{mean,max}_N*_r*s*.csv` | Mean per slot | 505/1207 | 96 slots |
+| `traffic_stats_std_{mean,max}_N*_r*s*.csv` | Std per slot | 505/1207 | 96 slots |
+| `traffic_stats_median_{mean,max}_N*_r*s*.csv` | Median per slot | 505/1207 | 96 slots |
+| `traffic_stats_iqr_{mean,max}_N*_r*s*.csv` | IQR per slot | 505/1207 | 96 slots |
+| `traffic_stats_count_N*.csv` | Observation count | 96 | 2 |
 
 **Column naming:** `r{radio}s{steps+1}` (e.g., `r1s6` = radio=1, steps=5, S=6)
 
@@ -247,7 +257,7 @@ df = correlate_stepwise('N505', 'DC', radio=1, steps=5)
 - [x] Traffic extraction (24 combinations × 2 networks)
 - [x] Weekday filtering
 - [x] Basic correlation analysis
-- [ ] Statistical aggregation (traffic_stats_*)
+- [x] Statistical aggregation (traffic_stats_*)
 - [ ] Threshold optimization
 - [ ] Full parameter sweep
 

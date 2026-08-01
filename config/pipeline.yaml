@@ -61,6 +61,7 @@ umbrales:
 # Rutas de salida
 output:
   combinaciones_dir: "data/processed/combinaciones"
+  traffic_stats_dir: "data/processed/traffic_stats"
   centralidad_dir: "data/network/serialized"
   resultados_dir: "results"
   figures_dir: "notebooks/results/figures"

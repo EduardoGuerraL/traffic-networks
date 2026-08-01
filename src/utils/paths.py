@@ -34,6 +34,7 @@ class PipelineConfig:
     umbrales_n_puntos: int
     umbrales_rango_factor: float
     combinaciones_dir: Path
+    traffic_stats_dir: Path
     centralidad_dir: Path
     resultados_dir: Path
     figures_dir: Path
@@ -78,6 +79,7 @@ def load_config(config_path: Path | None = None) -> PipelineConfig:
         umbrales_n_puntos=raw["umbrales"]["n_puntos"],
         umbrales_rango_factor=raw["umbrales"]["rango_factor"],
         combinaciones_dir=root / raw["output"]["combinaciones_dir"],
+        traffic_stats_dir=root / raw["output"].get("traffic_stats_dir", "data/processed/traffic_stats"),
         centralidad_dir=root / raw["output"]["centralidad_dir"],
         resultados_dir=root / raw["output"]["resultados_dir"],
         figures_dir=root / raw["output"]["figures_dir"],
@@ -137,6 +139,10 @@ def results_dir() -> Path:
 
 def combinaciones_dir() -> Path:
     return get_config().combinaciones_dir
+
+
+def traffic_stats_dir() -> Path:
+    return get_config().traffic_stats_dir
 
 
 # --- Helper lists for iteration ---

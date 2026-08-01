@@ -3,8 +3,8 @@ Paso 5b: Agregación temporal de tráfico.
 Agrupa los datos de tráfico por slots de 15 minutos y calcula estadísticas
 por calle: media, desviación estándar, mediana, IQR y conteo de observaciones.
 
-Genera 5 CSVs por combinación × filtro (weekdays/allweek):
-    traffic_stats_{stat}_{red}_r{radio}s{steps}_{filter}.csv
+Genera 5 CSVs por combinación:
+    traffic_stats_{stat}_{red}_r{radio}s{steps}.csv
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ import pandas as pd
 from src.utils.paths import (
     get_config,
     combinaciones_path,
+    traffic_stats_dir,
     iter_redes,
     iter_radios,
     iter_steps,
@@ -135,7 +136,6 @@ def aggregate_traffic_csv(
     Returns:
         Dict nombre_stat -> Path del CSV generado.
     """
-    filter_suffix = "weekdays" if weekdays_only else "allweek"
     stem = input_path.stem  # ej: traffic_mean_N505_r1s6
 
     # Extraer info del nombre: traffic_{stat}_{red}_r{radio}s{steps}
@@ -187,7 +187,7 @@ def aggregate_traffic_csv(
     output_dir.mkdir(parents=True, exist_ok=True)
     result_paths = {}
 
-    base_name = f"{stat_type}_{red}_{radio_steps}_{filter_suffix}"
+    base_name = f"{stat_type}_{red}_{radio_steps}"
 
     for stat_name, stat_dict in [
         ("mean", stats_mean),
@@ -224,7 +224,7 @@ def aggregate_traffic_csv(
     # CSV de conteo (una sola fila con los conteos por slot)
     count_data = {"slot": STANDARD_SLOTS, "count": [stats_count[s] for s in STANDARD_SLOTS]}
     df_count = pd.DataFrame(count_data)
-    count_path = output_dir / f"traffic_stats_count_{red}_{filter_suffix}.csv"
+    count_path = output_dir / f"traffic_stats_count_{red}.csv"
     df_count.to_csv(count_path, index=False)
     result_paths["count"] = count_path
 
@@ -244,8 +244,8 @@ def run_aggregation(
     """
     Ejecuta la agregación temporal para todas las combinaciones.
 
-    Genera un CSV de conteo por red × filtro (weekdays/allweek),
-    ya que el conteo es independiente de radio/steps.
+    Genera un CSV de conteo por red, ya que el conteo es independiente
+    de radio/steps.
 
     Args:
         red: 'N505' o 'N1207' (None = ambas).
@@ -257,27 +257,24 @@ def run_aggregation(
     radios = [radio] if radio is not None else iter_radios()
     steps_list = [steps] if steps is not None else iter_steps()
 
-    output_base = Path("data/processed/combinaciones")
+    output_base = traffic_stats_dir()
 
     total = 0
     for r in redes:
         print(f"\n=== Agregación: {r} ===")
 
-        # Generar CSVs de conteo una sola vez por red
-        for weekdays_only in [True, False]:
-            suffix = "weekdays" if weekdays_only else "allweek"
-            count_path = output_base / f"traffic_stats_count_{r}_{suffix}.csv"
+        # Generar CSV de conteo una sola vez por red
+        count_path = output_base / f"traffic_stats_count_{r}.csv"
 
-            if not force and count_path.exists():
-                print(f"  [SKIP] count {suffix} (ya existe)")
-                continue
-
+        if not force and count_path.exists():
+            print(f"  [SKIP] count (ya existe)")
+        else:
             # Usar la primera combinación disponible para calcular conteos
             first_input = combinaciones_path("mean", r, radios[0], steps_list[0])
             if first_input.exists():
-                print(f"  [PROCESS] count {suffix}...", end=" ", flush=True)
+                print(f"  [PROCESS] count...", end=" ", flush=True)
                 try:
-                    aggregate_traffic_csv(first_input, output_base, weekdays_only=weekdays_only)
+                    aggregate_traffic_csv(first_input, output_base)
                     print("OK")
                 except Exception as e:
                     print(f"ERROR: {e}")
@@ -292,8 +289,7 @@ def run_aggregation(
                         continue
 
                     # Verificar si ya existen los CSVs de salida
-                    filter_suffix = "weekdays"
-                    base_name = f"{stat}_{r}_r{rad}s{st+1}_{filter_suffix}"
+                    base_name = f"{stat}_{r}_r{rad}s{st+1}"
                     expected_path = output_base / f"traffic_stats_mean_{base_name}.csv"
 
                     if not force and expected_path.exists():
@@ -304,10 +300,7 @@ def run_aggregation(
                     print(f"  [PROCESS] {stat} r{rad}s{st+1}...", end=" ", flush=True)
                     try:
                         aggregate_traffic_csv(
-                            input_path, output_base, weekdays_only=True
-                        )
-                        aggregate_traffic_csv(
-                            input_path, output_base, weekdays_only=False
+                            input_path, output_base
                         )
                         print("OK")
                     except Exception as e:
